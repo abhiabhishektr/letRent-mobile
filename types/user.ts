@@ -1,4 +1,4 @@
-export type AppMode = 'tenant' | 'owner';
+export type AppMode = "tenant" | "owner";
 
 export type User = {
   id: string;

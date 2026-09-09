@@ -1,5 +1,56 @@
-import React from 'react';
-import { useRouter } from 'expo-router'; import { Pressable, StyleSheet, Text, View } from 'react-native'; import { colors } from '../theme';
-const tenant=[['⌂','Home','/tenant'],['▣','Payment','/tenant/payment'],['▤','History','/tenant/receipts'],['•••','More','/profile']]; const owner=[['⌂','Home','/owner'],['▥','Properties','/owner/properties'],['♙','Tenants','/owner/tenants'],['•••','More','/profile']];
-export function BottomNav({mode, active}:{mode:'tenant'|'owner';active:string}) { const router=useRouter(); return <View style={styles.nav}>{(mode==='tenant'?tenant:owner).map(([icon,label,path])=><Pressable key={label} onPress={()=>router.replace(path as never)} style={styles.item}><Text style={[styles.icon,active===label&&styles.selected]}>{icon}</Text><Text style={[styles.label,active===label&&styles.selected]}>{label}</Text></Pressable>)}</View> }
-const styles=StyleSheet.create({nav:{flexDirection:'row',backgroundColor:'#fff',borderTopWidth:1,borderColor:'#edf0f5',paddingVertical:8},item:{flex:1,alignItems:'center',gap:3},icon:{fontSize:19,color:'#8a96a8'},label:{fontSize:10,color:'#8a96a8'},selected:{color:colors.primary,fontWeight:'800'}});
+import React from "react";
+import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors } from "../theme";
+const tenant = [
+  ["⌂", "Home", "/tenant"],
+  ["▣", "Payment", "/tenant/payment"],
+  ["▤", "History", "/tenant/receipts"],
+  ["•••", "More", "/profile"],
+];
+const owner = [
+  ["⌂", "Home", "/owner"],
+  ["▥", "Properties", "/owner/properties"],
+  ["♙", "Tenants", "/owner/tenants"],
+  ["•••", "More", "/profile"],
+];
+export function BottomNav({
+  mode,
+  active,
+}: {
+  mode: "tenant" | "owner";
+  active: string;
+}) {
+  const router = useRouter();
+  return (
+    <View style={styles.nav}>
+      {(mode === "tenant" ? tenant : owner).map(([icon, label, path]) => (
+        <Pressable
+          key={label}
+          onPress={() => router.replace(path as never)}
+          style={styles.item}
+        >
+          <Text style={[styles.icon, active === label && styles.selected]}>
+            {icon}
+          </Text>
+          <Text style={[styles.label, active === label && styles.selected]}>
+            {label}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  nav: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#edf0f5",
+    paddingVertical: 8,
+  },
+  item: { flex: 1, alignItems: "center", gap: 3 },
+  icon: { fontSize: 19, color: "#8a96a8" },
+  label: { fontSize: 10, color: "#8a96a8" },
+  selected: { color: colors.primary, fontWeight: "800" },
+});

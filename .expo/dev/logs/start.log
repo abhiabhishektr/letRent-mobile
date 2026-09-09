@@ -303,3 +303,18 @@
 {"_e":"metro:client_log","_t":1788971305869,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
 {"_e":"metro:client_log","_t":1788971305870,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
 {"_e":"metro:client_log","_t":1788971305875,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"root:init","_t":1788978993113,"format":"v0-jsonl","version":"57.0.23"}
+{"_e":"env:mode","_t":1788978993114,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1788978993114,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1788978993273,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1788978993434,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1788978993528,"plugins":[]}
+{"_e":"metro:instantiate","_t":1788978993709,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1788979010666,"id":"1","platform":"android","environment":null,"entry":"node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1788979010666,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1788979010669,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1788979010769,"id":"1","progress":0.2763261640433615,"total":487,"current":256}
+{"_e":"metro:bundling:progress","_t":1788979010869,"id":"1","progress":0.4027639586779439,"total":895,"current":568}
+{"_e":"metro:bundling:progress","_t":1788979010969,"id":"1","progress":0.7870786678805135,"total":1037,"current":920}
+{"_e":"metro:bundling:progress","_t":1788979011069,"id":"1","progress":0.939385894903913,"total":1332,"current":1291}
+{"_e":"metro:bundling:done","_t":1788979011152,"id":"1","total":1332,"ms":486.416625}

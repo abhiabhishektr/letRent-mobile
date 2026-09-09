@@ -1,3 +1,117 @@
-import React, { useState } from 'react'; import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'; import { useRouter } from 'expo-router'; import { Screen } from '../components/Screen'; import { Button } from '../components/Button'; import { colors, spacing } from '../theme'; import { useAuth } from '../context/AuthContext';
-export default function Login() { const [phone,setPhone]=useState('98765 43210'); const {beginLogin}=useAuth(); const router=useRouter(); return <Screen style={styles.screen}><Pressable onPress={()=>router.back()}><Text style={styles.back}>‹</Text></Pressable><View><Text style={styles.title}>Login or Register</Text><Text style={styles.label}>Enter your mobile number to continue</Text><View style={styles.phone}><Text style={styles.code}>+91</Text><TextInput value={phone} onChangeText={setPhone} keyboardType="phone-pad" style={styles.input} maxLength={10}/></View><Button title="Continue" onPress={()=>beginLogin(phone)} style={styles.button}/><Text style={styles.or}>────────  or  ────────</Text><Button title="🌈   Continue with Google" outline onPress={()=>beginLogin(phone)} style={styles.social}/><Button title="●   Continue with Apple" outline onPress={()=>beginLogin(phone)} style={styles.social}/></View><Text style={styles.terms}>By continuing, you agree to our{'\n'}<Text style={styles.link}>Terms & Conditions</Text> and <Text style={styles.link}>Privacy Policy</Text></Text></Screen> }
-const styles=StyleSheet.create({screen:{paddingTop:spacing.md,paddingBottom:spacing.xl,justifyContent:'space-between'},back:{fontSize:36,color:colors.text,lineHeight:35},title:{fontSize:25,fontWeight:'800',color:colors.text,marginBottom:spacing.xl},label:{fontSize:13,color:colors.secondaryText,marginBottom:spacing.sm},phone:{height:55,borderWidth:1,borderColor:colors.border,borderRadius:10,flexDirection:'row',alignItems:'center',paddingHorizontal:spacing.md,backgroundColor:'#fff'},code:{fontWeight:'700',paddingRight:spacing.sm,borderRightWidth:1,borderRightColor:colors.border},input:{flex:1,fontSize:16,fontWeight:'600',paddingLeft:12,color:colors.text},button:{marginTop:spacing.lg},or:{color:colors.secondaryText,textAlign:'center',fontSize:12,marginVertical:spacing.lg},social:{backgroundColor:'#fff',borderColor:colors.border,marginBottom:spacing.sm},terms:{fontSize:11,textAlign:'center',color:colors.secondaryText,lineHeight:17},link:{color:colors.primary,fontWeight:'600'}});
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Screen } from "../components/Screen";
+import { Button } from "../components/Button";
+import { colors, spacing } from "../theme";
+import { useAuth } from "../context/AuthContext";
+export default function Login() {
+  const [phone, setPhone] = useState("98765 43210");
+  const { beginLogin } = useAuth();
+  const router = useRouter();
+  return (
+    <Screen style={styles.screen}>
+      <Pressable onPress={() => router.back()}>
+        <Text style={styles.back}>‹</Text>
+      </Pressable>
+      <View>
+        <Text style={styles.title}>Login or Register</Text>
+        <Text style={styles.label}>Enter your mobile number to continue</Text>
+        <View style={styles.phone}>
+          <Text style={styles.code}>+91</Text>
+          <TextInput
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            style={styles.input}
+            maxLength={10}
+          />
+        </View>
+        <Button
+          title="Continue"
+          onPress={() => beginLogin(phone)}
+          style={styles.button}
+        />
+        <Text style={styles.or}>──────── or ────────</Text>
+        <Button
+          title="🌈   Continue with Google"
+          outline
+          onPress={() => beginLogin(phone)}
+          style={styles.social}
+        />
+        <Button
+          title="●   Continue with Apple"
+          outline
+          onPress={() => beginLogin(phone)}
+          style={styles.social}
+        />
+      </View>
+      <Text style={styles.terms}>
+        By continuing, you agree to our{"\n"}
+        <Text style={styles.link}>Terms & Conditions</Text> and{" "}
+        <Text style={styles.link}>Privacy Policy</Text>
+      </Text>
+    </Screen>
+  );
+}
+const styles = StyleSheet.create({
+  screen: {
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
+    justifyContent: "space-between",
+  },
+  back: { fontSize: 36, color: colors.text, lineHeight: 35 },
+  title: {
+    fontSize: 25,
+    fontWeight: "800",
+    color: colors.text,
+    marginBottom: spacing.xl,
+  },
+  label: {
+    fontSize: 13,
+    color: colors.secondaryText,
+    marginBottom: spacing.sm,
+  },
+  phone: {
+    height: 55,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: spacing.md,
+    backgroundColor: "#fff",
+  },
+  code: {
+    fontWeight: "700",
+    paddingRight: spacing.sm,
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
+    paddingLeft: 12,
+    color: colors.text,
+  },
+  button: { marginTop: spacing.lg },
+  or: {
+    color: colors.secondaryText,
+    textAlign: "center",
+    fontSize: 12,
+    marginVertical: spacing.lg,
+  },
+  social: {
+    backgroundColor: "#fff",
+    borderColor: colors.border,
+    marginBottom: spacing.sm,
+  },
+  terms: {
+    fontSize: 11,
+    textAlign: "center",
+    color: colors.secondaryText,
+    lineHeight: 17,
+  },
+  link: { color: colors.primary, fontWeight: "600" },
+});

@@ -1,2 +1,74 @@
-import React from 'react'; import { Alert, StyleSheet, Text, View } from 'react-native'; import { useRouter } from 'expo-router'; import { Screen } from '../../components/Screen'; import { Button } from '../../components/Button'; import { colors, spacing } from '../../theme';
-export default function Payment(){const router=useRouter();return <Screen style={s.screen}><Text onPress={()=>router.back()} style={s.back}>‹</Text><Text style={s.title}>Pay Rent</Text><View style={s.card}><Text style={s.label}>September rent</Text><Text style={s.amount}>₹12,000</Text><Text style={s.label}>Green View Apartments · Unit 101</Text></View><Text style={s.section}>Choose payment method</Text>{['UPI','Debit or Credit Card','Net Banking'].map((x,i)=><View key={x} style={s.method}><Text style={s.icon}>{['◉','▣','⌁'][i]}</Text><Text style={s.methodText}>{x}</Text><Text>›</Text></View>)}<Button title="Pay ₹12,000" onPress={()=>{Alert.alert('Payment successful','Your rent payment receipt is ready.');router.replace('/tenant/receipts')}} style={s.button}/></Screen>};const s=StyleSheet.create({screen:{padding:spacing.lg},back:{fontSize:36,lineHeight:35},title:{fontSize:24,fontWeight:'800',marginTop:spacing.sm},card:{backgroundColor:'#f1f5ff',padding:spacing.lg,borderRadius:14,marginTop:spacing.xl},label:{fontSize:13,color:colors.secondaryText},amount:{fontSize:30,fontWeight:'800',marginVertical:spacing.sm},section:{fontSize:15,fontWeight:'800',marginTop:spacing.xl,marginBottom:spacing.sm},method:{backgroundColor:'#fff',borderWidth:1,borderColor:'#e9edf4',borderRadius:10,padding:spacing.md,marginBottom:spacing.sm,flexDirection:'row',alignItems:'center',gap:12},icon:{color:colors.primary,fontSize:18},methodText:{flex:1,fontWeight:'600'},button:{marginTop:'auto'}});
+import React from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { AppShell } from "../../components/AppShell";
+import { Button } from "../../components/Button";
+import { colors, spacing } from "../../theme";
+export default function Payment() {
+  const router = useRouter();
+  return (
+    <AppShell active="Payment" style={s.content}>
+      <Text onPress={() => router.back()} style={s.back}>
+        ‹
+      </Text>
+      <Text style={s.title}>Pay Rent</Text>
+      <View style={s.card}>
+        <Text style={s.label}>September rent</Text>
+        <Text style={s.amount}>₹12,000</Text>
+        <Text style={s.label}>Green View Apartments · Unit 101</Text>
+      </View>
+      <Text style={s.section}>Choose payment method</Text>
+      {["UPI", "Debit or Credit Card", "Net Banking"].map((x, i) => (
+        <View key={x} style={s.method}>
+          <Text style={s.icon}>{["◉", "▣", "⌁"][i]}</Text>
+          <Text style={s.methodText}>{x}</Text>
+          <Text>›</Text>
+        </View>
+      ))}
+      <Button
+        title="Pay ₹12,000"
+        onPress={() => {
+          Alert.alert(
+            "Payment successful",
+            "Your rent payment receipt is ready.",
+          );
+          router.replace("/tenant/receipts");
+        }}
+        style={s.button}
+      />
+    </AppShell>
+  );
+}
+const s = StyleSheet.create({
+  content: { padding: spacing.lg },
+  back: { fontSize: 36, lineHeight: 35 },
+  title: { fontSize: 24, fontWeight: "800", marginTop: spacing.sm },
+  card: {
+    backgroundColor: "#f1f5ff",
+    padding: spacing.lg,
+    borderRadius: 14,
+    marginTop: spacing.xl,
+  },
+  label: { fontSize: 13, color: colors.secondaryText },
+  amount: { fontSize: 30, fontWeight: "800", marginVertical: spacing.sm },
+  section: {
+    fontSize: 15,
+    fontWeight: "800",
+    marginTop: spacing.xl,
+    marginBottom: spacing.sm,
+  },
+  method: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e9edf4",
+    borderRadius: 10,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  icon: { color: colors.primary, fontSize: 18 },
+  methodText: { flex: 1, fontWeight: "600" },
+  button: { marginTop: "auto" },
+});

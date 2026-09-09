@@ -1,4 +1,145 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native'; import { useRouter } from 'expo-router'; import { Screen } from '../components/Screen'; import { Button } from '../components/Button'; import { BottomNav } from '../components/BottomNav'; import { ModeSwitch } from '../components/ModeSwitch'; import { rentRepository } from '../services/rentRepository'; import { colors, spacing } from '../theme';
-export default function Tenant() { const [data,setData]=useState<any>(); const router=useRouter(); useEffect(()=>{rentRepository.getTenantDashboard().then(setData)},[]); if(!data)return null; return <Screen style={styles.screen}><View style={styles.content}><View style={styles.top}><View><Text style={styles.hello}>Hello, {data.tenant.name} 👋</Text><Text style={styles.unit}>{data.tenant.unit}</Text></View><ModeSwitch /></View><View style={styles.rent}><View style={styles.row}><Text style={styles.month}>{data.rent.month} Rent</Text><Text style={styles.due}>Due</Text></View><Text style={styles.date}>{data.rent.dueOn}</Text><Text style={styles.amount}>₹{data.rent.amount.toLocaleString('en-IN')}</Text><Button title="Pay Rent" onPress={()=>router.push('/tenant/payment')} style={styles.pay}/></View><Text style={styles.section}>Overview</Text><View style={styles.overview}>{data.overview.map((x:any)=><View key={x.label} style={styles.metric}><Text style={styles.metricLabel}>{x.label}</Text><Text style={styles.metricValue}>{x.value}</Text></View>)}</View><Text style={styles.section}>Quick Actions</Text><View style={styles.actions}>{[['▣','Payment','/tenant/payment'],['▤','Receipts','/tenant/receipts'],['⌂','My Tenancy','/tenant/receipts'],['☎','Contact Owner','/profile']].map(([icon,label,path])=><View key={label} style={styles.action}><Text style={styles.actionIcon}>{icon}</Text><Text onPress={()=>router.push(path as never)} style={styles.actionText}>{label}</Text></View>)}</View></View><BottomNav mode="tenant" active="Home" /></Screen> }
-const styles=StyleSheet.create({screen:{padding:0},content:{flex:1,padding:spacing.lg},top:{flexDirection:'row',justifyContent:'space-between',alignItems:'flex-start'},hello:{fontSize:21,fontWeight:'800',color:colors.text},unit:{fontSize:12,color:colors.secondaryText,marginTop:3},rent:{backgroundColor:'#fff3f1',borderRadius:12,padding:spacing.lg,marginTop:spacing.lg,shadowColor:'#789',shadowOpacity:.08,shadowRadius:10,elevation:2},row:{flexDirection:'row',justifyContent:'space-between'},month:{fontWeight:'800',fontSize:15},due:{backgroundColor:'#fff',color:'#ed402f',fontSize:11,fontWeight:'800',padding:4,borderRadius:4},date:{color:colors.secondaryText,fontSize:12,marginTop:4},amount:{fontSize:24,fontWeight:'800',marginVertical:spacing.md},pay:{minHeight:43},section:{fontSize:14,fontWeight:'800',marginTop:spacing.lg,marginBottom:spacing.sm},overview:{flexDirection:'row',backgroundColor:'#fff',borderRadius:10,borderWidth:1,borderColor:'#e9edf4'},metric:{flex:1,padding:10,borderRightWidth:1,borderRightColor:'#e9edf4'},metricLabel:{fontSize:10,color:colors.secondaryText},metricValue:{fontWeight:'800',fontSize:14,marginTop:4},actions:{flexDirection:'row',justifyContent:'space-between'},action:{alignItems:'center',width:'24%'},actionIcon:{fontSize:20,color:colors.primary,borderWidth:1,borderColor:'#e7ecf4',padding:9,borderRadius:10},actionText:{fontSize:9,textAlign:'center',marginTop:5,color:colors.text}});
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Screen } from "../components/Screen";
+import { Button } from "../components/Button";
+import { BottomNav } from "../components/BottomNav";
+import { ModeSwitch } from "../components/ModeSwitch";
+import { rentRepository } from "../services/rentRepository";
+import { colors, spacing } from "../theme";
+export default function Tenant() {
+  const [data, setData] = useState<any>();
+  const router = useRouter();
+  useEffect(() => {
+    rentRepository.getTenantDashboard().then(setData);
+  }, []);
+  if (!data) return null;
+  return (
+    <Screen style={styles.screen}>
+      <View style={styles.content}>
+        <View style={styles.top}>
+          <View>
+            <Text style={styles.hello}>Hello, {data.tenant.name} 👋</Text>
+            <Text style={styles.unit}>{data.tenant.unit}</Text>
+          </View>
+          <ModeSwitch />
+        </View>
+        <View style={styles.rent}>
+          <View style={styles.row}>
+            <Text style={styles.month}>{data.rent.month} Rent</Text>
+            <Text style={styles.due}>Due</Text>
+          </View>
+          <Text style={styles.date}>{data.rent.dueOn}</Text>
+          <Text style={styles.amount}>
+            ₹{data.rent.amount.toLocaleString("en-IN")}
+          </Text>
+          <Button
+            title="Pay Rent"
+            onPress={() => router.push("/tenant/payment")}
+            style={styles.pay}
+          />
+        </View>
+        <Text style={styles.section}>Overview</Text>
+        <View style={styles.overview}>
+          {data.overview.map((x: any) => (
+            <View key={x.label} style={styles.metric}>
+              <Text style={styles.metricLabel}>{x.label}</Text>
+              <Text style={styles.metricValue}>{x.value}</Text>
+            </View>
+          ))}
+        </View>
+        <Text style={styles.section}>Quick Actions</Text>
+        <View style={styles.actions}>
+          {[
+            ["▣", "Payment", "/tenant/payment"],
+            ["▤", "Receipts", "/tenant/receipts"],
+            ["⌂", "My Tenancy", "/tenant/receipts"],
+            ["☎", "Contact Owner", "/profile"],
+          ].map(([icon, label, path]) => (
+            <View key={label} style={styles.action}>
+              <Text style={styles.actionIcon}>{icon}</Text>
+              <Text
+                onPress={() => router.push(path as never)}
+                style={styles.actionText}
+              >
+                {label}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+      <BottomNav mode="tenant" active="Home" />
+    </Screen>
+  );
+}
+const styles = StyleSheet.create({
+  screen: { padding: 0 },
+  content: { flex: 1, padding: spacing.lg },
+  top: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  hello: { fontSize: 21, fontWeight: "800", color: colors.text },
+  unit: { fontSize: 12, color: colors.secondaryText, marginTop: 3 },
+  rent: {
+    backgroundColor: "#fff3f1",
+    borderRadius: 12,
+    padding: spacing.lg,
+    marginTop: spacing.lg,
+    shadowColor: "#789",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  row: { flexDirection: "row", justifyContent: "space-between" },
+  month: { fontWeight: "800", fontSize: 15 },
+  due: {
+    backgroundColor: "#fff",
+    color: "#ed402f",
+    fontSize: 11,
+    fontWeight: "800",
+    padding: 4,
+    borderRadius: 4,
+  },
+  date: { color: colors.secondaryText, fontSize: 12, marginTop: 4 },
+  amount: { fontSize: 24, fontWeight: "800", marginVertical: spacing.md },
+  pay: { minHeight: 43 },
+  section: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  overview: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#e9edf4",
+  },
+  metric: {
+    flex: 1,
+    padding: 10,
+    borderRightWidth: 1,
+    borderRightColor: "#e9edf4",
+  },
+  metricLabel: { fontSize: 10, color: colors.secondaryText },
+  metricValue: { fontWeight: "800", fontSize: 14, marginTop: 4 },
+  actions: { flexDirection: "row", justifyContent: "space-between" },
+  action: { alignItems: "center", width: "24%" },
+  actionIcon: {
+    fontSize: 20,
+    color: colors.primary,
+    borderWidth: 1,
+    borderColor: "#e7ecf4",
+    padding: 9,
+    borderRadius: 10,
+  },
+  actionText: {
+    fontSize: 9,
+    textAlign: "center",
+    marginTop: 5,
+    color: colors.text,
+  },
+});

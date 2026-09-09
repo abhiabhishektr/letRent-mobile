@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -6,9 +6,9 @@ import {
   StyleSheet,
   View,
   ViewStyle,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing } from '../theme';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors, spacing } from "../theme";
 
 export function Screen({
   children,
@@ -20,7 +20,10 @@ export function Screen({
   style?: ViewStyle;
 }) {
   const content = scroll ? (
-    <ScrollView contentContainerStyle={[styles.scroll, style]} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={[styles.scroll, style]}
+      keyboardShouldPersistTaps="handled"
+    >
       {children}
     </ScrollView>
   ) : (
@@ -31,7 +34,7 @@ export function Screen({
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         {content}
       </KeyboardAvoidingView>

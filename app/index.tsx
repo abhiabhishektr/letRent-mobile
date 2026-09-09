@@ -1,6 +1,71 @@
-import React from 'react';
-import { Redirect, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Screen } from '../components/Screen'; import { Button } from '../components/Button'; import { colors, spacing } from '../theme'; import { useAuth } from '../context/AuthContext';
-export default function Welcome() { const { currentUser, isLoading } = useAuth(); const router = useRouter(); if (isLoading) return null; if (currentUser) return <Redirect href={currentUser.mode === 'tenant' ? '/tenant' : '/owner'} />; return <Screen style={styles.screen}><View><Text style={styles.brand}>Welcome to{'\n'}<Text style={styles.brandStrong}>LetRent</Text> 👋</Text><Text style={styles.copy}>Manage your rent, pay on time,{'\n'}get receipts and stay informed.</Text></View><View style={styles.illustration}><Text style={styles.building}>▥</Text><Text style={styles.person}>👤</Text></View><View><Button title="Next" onPress={() => router.push('/login')} /><Pressable onPress={() => router.push('/login')}><Text style={styles.skip}>Skip</Text></Pressable></View></Screen>; }
-const styles = StyleSheet.create({ screen:{justifyContent:'space-between',paddingVertical:spacing.xxl},brand:{fontSize:26,fontWeight:'500',lineHeight:34,color:colors.text},brandStrong:{fontWeight:'800'},copy:{fontSize:14,lineHeight:22,color:colors.secondaryText,marginTop:spacing.md},illustration:{height:260,alignItems:'center',justifyContent:'center',backgroundColor:'#f3f6ff',borderRadius:130,marginHorizontal:10},building:{fontSize:120,color:'#98b2ff'},person:{fontSize:52,position:'absolute',bottom:42,left:40},skip:{color:colors.primary,textAlign:'center',fontWeight:'600',marginTop:spacing.lg} });
+import React from "react";
+import { Redirect, useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Screen } from "../components/Screen";
+import { Button } from "../components/Button";
+import { colors, spacing } from "../theme";
+import { useAuth } from "../context/AuthContext";
+export default function Welcome() {
+  const { currentUser, isLoading } = useAuth();
+  const router = useRouter();
+  if (isLoading) return null;
+  if (currentUser)
+    return (
+      <Redirect href={currentUser.mode === "tenant" ? "/tenant" : "/owner"} />
+    );
+  return (
+    <Screen style={styles.screen}>
+      <View>
+        <Text style={styles.brand}>
+          Welcome to{"\n"}
+          <Text style={styles.brandStrong}>LetRent</Text> 👋
+        </Text>
+        <Text style={styles.copy}>
+          Manage your rent, pay on time,{"\n"}get receipts and stay informed.
+        </Text>
+      </View>
+      <View style={styles.illustration}>
+        <Text style={styles.building}>▥</Text>
+        <Text style={styles.person}>👤</Text>
+      </View>
+      <View>
+        <Button title="Next" onPress={() => router.push("/login")} />
+        <Pressable onPress={() => router.push("/login")}>
+          <Text style={styles.skip}>Skip</Text>
+        </Pressable>
+      </View>
+    </Screen>
+  );
+}
+const styles = StyleSheet.create({
+  screen: { justifyContent: "space-between", paddingVertical: spacing.xxl },
+  brand: {
+    fontSize: 26,
+    fontWeight: "500",
+    lineHeight: 34,
+    color: colors.text,
+  },
+  brandStrong: { fontWeight: "800" },
+  copy: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.secondaryText,
+    marginTop: spacing.md,
+  },
+  illustration: {
+    height: 260,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3f6ff",
+    borderRadius: 130,
+    marginHorizontal: 10,
+  },
+  building: { fontSize: 120, color: "#98b2ff" },
+  person: { fontSize: 52, position: "absolute", bottom: 42, left: 40 },
+  skip: {
+    color: colors.primary,
+    textAlign: "center",
+    fontWeight: "600",
+    marginTop: spacing.lg,
+  },
+});

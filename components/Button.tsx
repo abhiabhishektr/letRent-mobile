@@ -1,6 +1,12 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import React from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  ViewStyle,
+} from "react-native";
+import { colors, spacing, typography } from "../theme";
 
 type Props = {
   title: string;
@@ -12,7 +18,15 @@ type Props = {
   style?: ViewStyle;
 };
 
-export function Button({ title, onPress, loading, disabled, danger, outline, style }: Props) {
+export function Button({
+  title,
+  onPress,
+  loading,
+  disabled,
+  danger,
+  outline,
+  style,
+}: Props) {
   const inactive = disabled || loading;
   return (
     <Pressable
@@ -29,9 +43,16 @@ export function Button({ title, onPress, loading, disabled, danger, outline, sty
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={outline ? colors.primary : '#fff'} />
+        <ActivityIndicator color={outline ? colors.primary : "#fff"} />
       ) : (
-        <Text style={[typography.button, outline ? styles.outlineText : styles.text]}>{title}</Text>
+        <Text
+          style={[
+            typography.button,
+            outline ? styles.outlineText : styles.text,
+          ]}
+        >
+          {title}
+        </Text>
       )}
     </Pressable>
   );
@@ -42,14 +63,18 @@ const styles = StyleSheet.create({
     minHeight: 48,
     borderRadius: 10,
     backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: spacing.lg,
   },
   danger: { backgroundColor: colors.error },
-  outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
+  outline: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
   disabled: { backgroundColor: colors.disabled },
   pressed: { opacity: 0.75 },
-  text: { color: '#fff' },
+  text: { color: "#fff" },
   outlineText: { color: colors.primary },
 });

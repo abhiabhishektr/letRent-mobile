@@ -1,19 +1,29 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+} from "react-native";
+import { colors, spacing, typography } from "../theme";
 
 type Props = TextInputProps & { label: string; error?: string };
 
 export function Input({ label, error, ...props }: Props) {
   return (
     <View style={styles.container}>
-      {label ? <Text style={[typography.label, styles.label]}>{label}</Text> : null}
+      {label ? (
+        <Text style={[typography.label, styles.label]}>{label}</Text>
+      ) : null}
       <TextInput
         {...props}
         style={[styles.input, error && styles.errorInput]}
         placeholderTextColor={colors.secondaryText}
       />
-      {error ? <Text style={[typography.caption, styles.error]}>{error}</Text> : null}
+      {error ? (
+        <Text style={[typography.caption, styles.error]}>{error}</Text>
+      ) : null}
     </View>
   );
 }
