@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing } from "../theme";
-
 export function Screen({
   children,
   scroll = false,
@@ -29,7 +28,6 @@ export function Screen({
   ) : (
     <View style={[styles.content, style]}>{children}</View>
   );
-
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
@@ -41,7 +39,6 @@ export function Screen({
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },

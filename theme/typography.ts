@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-
 export const typography = StyleSheet.create({
   screenTitle: { fontSize: 24, fontWeight: "700", lineHeight: 30 },
   sectionTitle: { fontSize: 18, fontWeight: "600", lineHeight: 24 },

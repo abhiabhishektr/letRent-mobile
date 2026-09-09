@@ -3,7 +3,6 @@ import { StyleSheet, View, ViewStyle } from "react-native";
 import { Screen } from "./Screen";
 import { BottomNav } from "./BottomNav";
 import { useAuth } from "../context/AuthContext";
-
 /** Provides a persistent, bottom-aligned nav area for authenticated screens. */
 export function AppShell({
   children,

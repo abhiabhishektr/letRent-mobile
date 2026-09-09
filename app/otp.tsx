@@ -5,18 +5,15 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { colors, spacing, typography } from "../theme";
 import { FIXED_OTP, useAuth } from "../context/AuthContext";
-
 export default function Otp() {
   const { verifyOtp } = useAuth();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-
   const submit = async () => {
     if (!otp.trim()) {
       Alert.alert("Missing OTP", "Enter the one-time password.");
       return;
     }
-
     setLoading(true);
     try {
       await verifyOtp(otp);
@@ -29,7 +26,6 @@ export default function Otp() {
       setLoading(false);
     }
   };
-
   return (
     <Screen scroll style={styles.screen}>
       <View style={styles.header}>
@@ -57,7 +53,6 @@ export default function Otp() {
     </Screen>
   );
 }
-
 const styles = StyleSheet.create({
   screen: { justifyContent: "center" },
   header: { marginBottom: spacing.xl },

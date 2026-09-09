@@ -1,6 +1,5 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { colors } from "../theme";
-
 export function Loading() {
   return (
     <View style={styles.container}>
@@ -8,7 +7,6 @@ export function Loading() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

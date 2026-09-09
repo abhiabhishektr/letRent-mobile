@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { AppMode, User } from "../types/user";
 import { storage } from "../services/storage";
-
 type AuthContextValue = {
   currentUser: User | null;
   isLoading: boolean;

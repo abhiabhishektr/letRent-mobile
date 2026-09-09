@@ -7,7 +7,6 @@ import {
   ViewStyle,
 } from "react-native";
 import { colors, spacing, typography } from "../theme";
-
 type Props = {
   title: string;
   onPress: () => void;
@@ -17,7 +16,6 @@ type Props = {
   outline?: boolean;
   style?: ViewStyle;
 };
-
 export function Button({
   title,
   onPress,
@@ -57,7 +55,6 @@ export function Button({
     </Pressable>
   );
 }
-
 const styles = StyleSheet.create({
   base: {
     minHeight: 48,

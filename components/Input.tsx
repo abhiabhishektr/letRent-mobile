@@ -7,9 +7,7 @@ import {
   View,
 } from "react-native";
 import { colors, spacing, typography } from "../theme";
-
 type Props = TextInputProps & { label: string; error?: string };
-
 export function Input({ label, error, ...props }: Props) {
   return (
     <View style={styles.container}>
@@ -27,7 +25,6 @@ export function Input({ label, error, ...props }: Props) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { marginBottom: spacing.md },
   label: { color: colors.text, marginBottom: spacing.xs },
