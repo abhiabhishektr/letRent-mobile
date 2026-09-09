@@ -14,14 +14,17 @@ Scan the QR code with Expo Go.
 ## Demo accounts
 
 Admin:
+
 - admin@example.com
 - admin123
 
 User:
+
 - john@example.com
 - user123
 
 Demo OTP:
+
 - 123456
 
 ## Features
