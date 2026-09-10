@@ -5,10 +5,13 @@ import {
   StyleSheet,
   Text,
   ViewStyle,
+  View,
 } from "react-native";
+import type { ReactNode } from "react";
 import { colors, spacing, typography } from "../theme";
 type Props = {
   title: string;
+  icon?: ReactNode;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
@@ -18,6 +21,7 @@ type Props = {
 };
 export function Button({
   title,
+  icon,
   onPress,
   loading,
   disabled,
@@ -43,14 +47,18 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={outline ? colors.primary : "#fff"} />
       ) : (
-        <Text
-          style={[
-            typography.button,
-            outline ? styles.outlineText : styles.text,
-          ]}
-        >
-          {title}
-        </Text>
+        <View style={styles.content}>
+          {icon}
+          <Text
+            style={[
+              typography.button,
+              outline ? styles.outlineText : styles.text,
+              !!icon && styles.titleWithIcon,
+            ]}
+          >
+            {title}
+          </Text>
+        </View>
       )}
     </Pressable>
   );
@@ -74,4 +82,6 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.75 },
   text: { color: "#fff" },
   outlineText: { color: colors.primary },
+  content: { flexDirection: "row", alignItems: "center" },
+  titleWithIcon: { marginLeft: spacing.sm },
 });

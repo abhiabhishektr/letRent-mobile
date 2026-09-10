@@ -1,71 +1,161 @@
 import React from "react";
 import { Redirect, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Dimensions } from "react-native";
+import LottieView from "lottie-react-native";
+
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
 import { colors, spacing } from "../theme";
 import { useAuth } from "../context/AuthContext";
+
+const { width } = Dimensions.get("window");
+
 export default function Welcome() {
   const { currentUser, isLoading } = useAuth();
   const router = useRouter();
+
   if (isLoading) return null;
-  if (currentUser)
+
+  if (currentUser) {
     return (
-      <Redirect href={currentUser.mode === "tenant" ? "/tenant" : "/owner"} />
+      <Redirect
+        href={currentUser.mode === "tenant" ? "/tenant" : "/owner"}
+      />
     );
+  }
+
   return (
     <Screen style={styles.screen}>
-      <View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.welcome}>Welcome to</Text>
         <Text style={styles.brand}>
-          Welcome to{"\n"}
-          <Text style={styles.brandStrong}>LetRent</Text> 👋
+          LetRent <Text style={styles.wave}>👋</Text>
         </Text>
         <Text style={styles.copy}>
-          Manage your rent, pay on time,{"\n"}get receipts and stay informed.
+          Making rent payments{"\n"}
+          simple and effortless.
         </Text>
       </View>
-      <View style={styles.illustration}>
-        <Text style={styles.building}>▥</Text>
-        <Text style={styles.person}>👤</Text>
+
+      {/* Illustration */}
+      <View style={styles.illustrationContainer}>
+        <View style={styles.illustrationBackground}>
+          <LottieView
+            source={require("../utils/building.json")}
+            autoPlay
+            loop
+            style={styles.animation}
+            resizeMode="cover"
+          />
+        </View>
       </View>
-      <View>
-        <Button title="Next" onPress={() => router.push("/login")} />
-        <Pressable onPress={() => router.push("/login")}>
-          <Text style={styles.skip}>Skip</Text>
+
+      {/* Actions */}
+      <View style={styles.actions}>
+        <Button
+          title="Get Started"
+          onPress={() => router.push("/login")}
+          style={styles.primaryButton}
+        />
+        <Pressable
+          onPress={() => router.push("/login")}
+          style={({ pressed }) => [
+            styles.skipButton,
+            pressed && styles.skipButtonPressed,
+          ]}
+        >
+          <Text style={styles.skip}>Skip for now</Text>
         </Pressable>
       </View>
     </Screen>
   );
 }
+
 const styles = StyleSheet.create({
-  screen: { justifyContent: "space-between", paddingVertical: spacing.xxl },
-  brand: {
-    fontSize: 26,
+  screen: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: spacing.xxl,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.background || "#ffffff",
+  },
+  header: {
+    paddingTop: spacing.xl,
+    alignItems: "flex-start",
+  },
+  welcome: {
+    fontSize: 22,
     fontWeight: "500",
-    lineHeight: 34,
-    color: colors.text,
-  },
-  brandStrong: { fontWeight: "800" },
-  copy: {
-    fontSize: 14,
-    lineHeight: 22,
     color: colors.secondaryText,
-    marginTop: spacing.md,
+    letterSpacing: 0.5,
   },
-  illustration: {
-    height: 260,
+  brand: {
+    fontSize: 48,
+    fontWeight: "900",
+    letterSpacing: -1.5,
+    color: colors.primary, // Highlighted the brand name
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  wave: {
+    fontSize: 38,
+  },
+  copy: {
+    fontSize: 18,
+    lineHeight: 26,
+    color: colors.text,
+    fontWeight: "400",
+    opacity: 0.8,
+  },
+  illustrationContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3f6ff",
-    borderRadius: 130,
-    marginHorizontal: 10,
   },
-  building: { fontSize: 120, color: "#98b2ff" },
-  person: { fontSize: 52, position: "absolute", bottom: 42, left: 40 },
+  illustrationBackground: {
+    width: width * 0.8,
+    height: width * 0.8,
+    backgroundColor: "#F4F7FF", // Softer, premium background tint
+    borderRadius: width * 0.4, // Perfect circle
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 2,
+  },
+  animation: {
+    width: "110%",
+    height: "110%",
+  },
+  actions: {
+    paddingBottom: spacing.lg,
+    width: "100%",
+  },
+  primaryButton: {
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  skipButton: {
+    alignItems: "center",
+    paddingVertical: spacing.lg,
+    marginTop: spacing.sm,
+  },
+  skipButtonPressed: {
+    opacity: 0.6,
+  },
   skip: {
-    color: colors.primary,
-    textAlign: "center",
+    color: colors.secondaryText,
+    fontSize: 16,
     fontWeight: "600",
-    marginTop: spacing.lg,
+    letterSpacing: 0.3,
   },
 });

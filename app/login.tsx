@@ -1,117 +1,331 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Platform,
+  ScrollView,
+  Image,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Screen } from "../components/Screen";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
+
 import { Button } from "../components/Button";
 import { colors, spacing } from "../theme";
 import { useAuth } from "../context/AuthContext";
+
 export default function Login() {
-  const [phone, setPhone] = useState("98765 43210");
+  const [phone, setPhone] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+
   const { beginLogin } = useAuth();
   const router = useRouter();
+
   return (
-    <Screen style={styles.screen}>
-      <Pressable onPress={() => router.back()}>
-        <Text style={styles.back}>‹</Text>
-      </Pressable>
-      <View>
-        <Text style={styles.title}>Login or Register</Text>
-        <Text style={styles.label}>Enter your mobile number to continue</Text>
-        <View style={styles.phone}>
-          <Text style={styles.code}>+91</Text>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            style={styles.input}
-            maxLength={10}
+    <SafeAreaView style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="none"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={styles.topSection}>
+          {/* Back Button */}
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && styles.backButtonPressed,
+            ]}
+            hitSlop={8}
+          >
+            <AntDesign
+              name="left"
+              size={20}
+              color={colors.text}
+              style={
+                Platform.OS === "ios"
+                  ? { marginLeft: -2 }
+                  : undefined
+              }
+            />
+          </Pressable>
+
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Welcome back</Text>
+
+            <Text style={styles.subtitle}>
+              Enter your mobile number to continue
+            </Text>
+          </View>
+
+          {/* Phone Input */}
+          <View
+            style={[
+              styles.phoneContainer,
+              isFocused && styles.phoneContainerFocused,
+            ]}
+          >
+            <Text style={styles.code}>+91</Text>
+
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              keyboardType="phone-pad"
+              style={styles.input}
+              maxLength={10}
+              placeholder="00000 00000"
+              placeholderTextColor={colors.secondaryText}
+              selectionColor={colors.primary}
+              returnKeyType="done"
+            />
+          </View>
+
+          {/* Continue */}
+          <Button
+            title="Continue"
+            onPress={() => beginLogin(phone)}
+            style={styles.primaryButton}
+            disabled={phone.length < 10}
+          />
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+
+            <Text style={styles.orText}>OR</Text>
+
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Google */}
+          <Button
+            title="Continue with Google"
+            icon={
+              <Image
+                source={{
+                  uri: "https://img.icons8.com/color/48/000000/google-logo.png",
+                }}
+                style={styles.googleIcon}
+                resizeMode="contain"
+              />
+            }
+            outline
+            onPress={() => beginLogin(phone)}
+            style={styles.social}
+          />
+
+          {/* Apple */}
+          <Button
+            title={
+              Platform.OS === "ios"
+                ? "Continue with Apple"
+                : "Sign in with Apple"
+            }
+            icon={
+              <FontAwesome
+                name="apple"
+                size={22}
+                color={colors.text}
+              />
+            }
+            outline
+            onPress={() => beginLogin(phone)}
+            style={styles.social}
           />
         </View>
-        <Button
-          title="Continue"
-          onPress={() => beginLogin(phone)}
-          style={styles.button}
-        />
-        <Text style={styles.or}>──────── or ────────</Text>
-        <Button
-          title="🌈   Continue with Google"
-          outline
-          onPress={() => beginLogin(phone)}
-          style={styles.social}
-        />
-        <Button
-          title="●   Continue with Apple"
-          outline
-          onPress={() => beginLogin(phone)}
-          style={styles.social}
-        />
-      </View>
-      <Text style={styles.terms}>
-        By continuing, you agree to our{"\n"}
-        <Text style={styles.link}>Terms & Conditions</Text> and{" "}
-        <Text style={styles.link}>Privacy Policy</Text>
-      </Text>
-    </Screen>
+
+        {/* Footer */}
+        <Text style={styles.terms}>
+          By continuing, you agree to our{"\n"}
+          <Text style={styles.link}>Terms & Conditions</Text>
+          {" and "}
+          <Text style={styles.link}>Privacy Policy</Text>
+        </Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   screen: {
+    flex: 1,
+    backgroundColor: colors.background || "#FFFFFF",
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.xl,
+    paddingBottom:
+      Platform.OS === "ios" ? spacing.xl : spacing.lg,
     justifyContent: "space-between",
   },
-  back: { fontSize: 36, color: colors.text, lineHeight: 35 },
-  title: {
-    fontSize: 25,
-    fontWeight: "800",
-    color: colors.text,
+
+  topSection: {
+    flex: 1,
+  },
+
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F4F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.xl,
+    marginTop: Platform.OS === "android" ? spacing.md : 0,
+  },
+
+  backButtonPressed: {
+    opacity: 0.6,
+    backgroundColor: "#EAEAEC",
+  },
+
+  headerContainer: {
     marginBottom: spacing.xl,
   },
-  label: {
-    fontSize: 13,
-    color: colors.secondaryText,
-    marginBottom: spacing.sm,
+
+  title: {
+    fontSize: Platform.OS === "ios" ? 28 : 26,
+    fontWeight: Platform.OS === "ios" ? "700" : "bold",
+    color: colors.text,
+    letterSpacing: Platform.OS === "ios" ? 0.3 : 0,
+    marginBottom: spacing.xs,
   },
-  phone: {
-    height: 55,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
+
+  subtitle: {
+    fontSize: 15,
+    color: colors.secondaryText,
+    fontWeight: "400",
+    lineHeight: 22,
+  },
+
+  phoneContainer: {
+    height: 56,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.md,
-    backgroundColor: "#fff",
+    backgroundColor: "#F9F9FA",
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: "transparent",
+    marginBottom: spacing.lg,
   },
+
+  phoneContainerFocused: {
+    borderColor: colors.primary,
+    backgroundColor: "#FFFFFF",
+
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+
+      android: {
+        elevation: 4,
+        shadowColor: colors.primary,
+      },
+    }),
+  },
+
   code: {
-    fontWeight: "700",
-    paddingRight: spacing.sm,
-    borderRightWidth: 1,
-    borderRightColor: colors.border,
-  },
-  input: {
-    flex: 1,
     fontSize: 16,
     fontWeight: "600",
-    paddingLeft: 12,
     color: colors.text,
+    paddingRight: spacing.sm,
+    borderRightWidth: 1,
+    borderRightColor: "#EAEAEC",
   },
-  button: { marginTop: spacing.lg },
-  or: {
+
+  input: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "500",
+    paddingLeft: spacing.md,
+    color: colors.text,
+    height: "100%",
+    letterSpacing: 1,
+  },
+
+  primaryButton: {
+    borderRadius: 16,
+    height: 56,
+
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+      },
+
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: spacing.xl,
+  },
+
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#EAEAEC",
+  },
+
+  orText: {
     color: colors.secondaryText,
-    textAlign: "center",
-    fontSize: 12,
-    marginVertical: spacing.lg,
+    fontSize: 13,
+    fontWeight: "600",
+    marginHorizontal: spacing.md,
+    letterSpacing: 0.5,
   },
+
   social: {
-    backgroundColor: "#fff",
-    borderColor: colors.border,
-    marginBottom: spacing.sm,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#EAEAEC",
+    borderWidth: 1,
+    marginBottom: spacing.md,
+    borderRadius: 16,
+    height: 56,
   },
+
+  googleIcon: {
+    width: 24,
+    height: 24,
+  },
+
   terms: {
-    fontSize: 11,
+    fontSize: 13,
     textAlign: "center",
     color: colors.secondaryText,
-    lineHeight: 17,
+    lineHeight: 20,
+    marginTop: spacing.lg,
   },
-  link: { color: colors.primary, fontWeight: "600" },
+
+  link: {
+    color: colors.primary,
+    fontWeight: "600",
+  },
 });
