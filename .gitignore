@@ -54,4 +54,5 @@ build/
 
 # Generated files
 *.generated.*
-export.log
+export.log.
+expo/dev/logs/export.log
