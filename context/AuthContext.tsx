@@ -9,6 +9,7 @@ type AuthContextValue = {
   mode: AppMode;
   beginLogin: (phone: string) => void;
   verifyOtp: (otp: string) => Promise<void>;
+  updateProfile: (updates: Partial<Pick<User, "name" | "phone">>) => Promise<void>;
   switchMode: (mode: AppMode) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -42,6 +43,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setCurrentUser(user);
     router.replace("/tenant");
   };
+  const updateProfile = async (
+    updates: Partial<Pick<User, "name" | "phone">>,
+  ) => {
+    if (!currentUser) return;
+    const user = { ...currentUser, ...updates };
+    await storage.set(SESSION_KEY, user);
+    setCurrentUser(user);
+  };
   const switchMode = async (mode: AppMode) => {
     if (!currentUser) return;
     const user = { ...currentUser, mode };
@@ -63,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         mode: currentUser?.mode ?? "tenant",
         beginLogin,
         verifyOtp,
+        updateProfile,
         switchMode,
         logout,
       }}
