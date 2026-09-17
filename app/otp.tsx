@@ -55,8 +55,11 @@ export default function Otp() {
     }
   };
 
-  const handleCellPress = () => {
-    inputRef.current?.focus();
+  const focusOtpInput = () => {
+    // On Android, dismissing the keyboard does not always blur the hidden input.
+    // A no-op focus call then cannot re-open it, so reset native focus first.
+    inputRef.current?.blur();
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   return (
@@ -97,7 +100,7 @@ export default function Otp() {
             </View>
 
             {/* Custom OTP Input Boxes */}
-            <Pressable style={styles.otpContainer} onPress={handleCellPress}>
+            <Pressable style={styles.otpContainer} onPressIn={focusOtpInput}>
               {Array(OTP_LENGTH).fill(0).map((_, index) => {
                 const char = otp[index] || "";
                 const isCurrentCell = index === otp.length;
@@ -131,6 +134,7 @@ export default function Otp() {
               keyboardType="number-pad"
               textContentType="oneTimeCode" // iOS SMS Auto-fill
               autoComplete="sms-otp" // Android SMS Auto-fill
+              showSoftInputOnFocus
               style={styles.hiddenInput}
               caretHidden={true}
             />
