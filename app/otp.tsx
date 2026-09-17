@@ -8,9 +8,9 @@ import {
   Platform,
   Pressable,
   KeyboardAvoidingView,
-  ScrollView,
-  SafeAreaView
+  ScrollView
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -25,7 +25,6 @@ export default function Otp() {
   const router = useRouter();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   
   // FIX: Added <TextInput> type to useRef
   const inputRef = useRef<TextInput>(null);
@@ -64,7 +63,7 @@ export default function Otp() {
     <SafeAreaView style={styles.screen}>
       <KeyboardAvoidingView 
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
@@ -101,8 +100,8 @@ export default function Otp() {
             <Pressable style={styles.otpContainer} onPress={handleCellPress}>
               {Array(OTP_LENGTH).fill(0).map((_, index) => {
                 const char = otp[index] || "";
-                const isCurrentCell = isFocused && index === otp.length;
-                const isLastCellFocused = isFocused && index === OTP_LENGTH - 1 && otp.length === OTP_LENGTH;
+                const isCurrentCell = index === otp.length;
+                const isLastCellFocused = index === OTP_LENGTH - 1 && otp.length === OTP_LENGTH;
                 const isActive = isCurrentCell || isLastCellFocused;
                 const isFilled = !!char;
 
@@ -132,8 +131,6 @@ export default function Otp() {
               keyboardType="number-pad"
               textContentType="oneTimeCode" // iOS SMS Auto-fill
               autoComplete="sms-otp" // Android SMS Auto-fill
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
               style={styles.hiddenInput}
               caretHidden={true}
             />

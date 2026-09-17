@@ -7,6 +7,7 @@ import {
   View,
   Platform,
   ScrollView,
+  KeyboardAvoidingView,
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,17 +20,18 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
 
   const { beginLogin } = useAuth();
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
+      <KeyboardAvoidingView style={styles.keyboardAvoidingView} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="none"
+        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
+        automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
@@ -65,19 +67,12 @@ export default function Login() {
           </View>
 
           {/* Phone Input */}
-          <View
-            style={[
-              styles.phoneContainer,
-              isFocused && styles.phoneContainerFocused,
-            ]}
-          >
+          <View style={styles.phoneContainer}>
             <Text style={styles.code}>+91</Text>
 
             <TextInput
               value={phone}
               onChangeText={setPhone}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
               keyboardType="phone-pad"
               style={styles.input}
               maxLength={10}
@@ -150,6 +145,7 @@ export default function Login() {
           <Text style={styles.link}>Privacy Policy</Text>
         </Text>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -159,6 +155,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background || "#FFFFFF",
   },
+
+  keyboardAvoidingView: { flex: 1 },
 
   scrollContent: {
     flexGrow: 1,
@@ -218,28 +216,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "transparent",
     marginBottom: spacing.lg,
-  },
-
-  phoneContainerFocused: {
-    borderColor: colors.primary,
-    backgroundColor: "#FFFFFF",
-
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-
-      android: {
-        elevation: 4,
-        shadowColor: colors.primary,
-      },
-    }),
   },
 
   code: {

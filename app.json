@@ -15,7 +15,11 @@
       }
     },
     "android": {
-      "package": "com.abhiabhishektr.letrent"
+      "package": "com.abhiabhishektr.letrent",
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "androidStatusBar": {
+      "translucent": false
     }
   }
 }
