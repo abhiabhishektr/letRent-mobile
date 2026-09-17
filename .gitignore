@@ -54,3 +54,4 @@ build/
 
 # Generated files
 *.generated.*
+export.log
