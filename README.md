@@ -37,3 +37,5 @@ Demo OTP:
 - Local persistence with AsyncStorage
 
 There is intentionally no backend or external database.
+
+tree -I 'node_modules|.expo|.git|dist|build|coverage|*.lock' -L 3

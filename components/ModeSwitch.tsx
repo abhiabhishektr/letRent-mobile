@@ -3,12 +3,13 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { colors } from "../theme";
 export function ModeSwitch() {
-  const { mode, switchMode } = useAuth();
+  const { mode, switchMode, isModeSwitching } = useAuth();
   return (
     <View style={styles.wrap}>
       <Pressable
         onPress={() => switchMode("tenant")}
-        style={[styles.item, mode === "tenant" && styles.active]}
+        disabled={isModeSwitching || mode === "tenant"}
+        style={[styles.item, mode === "tenant" && styles.active, isModeSwitching && styles.disabled]}
       >
         <Text style={[styles.text, mode === "tenant" && styles.activeText]}>
           Tenant
@@ -16,7 +17,8 @@ export function ModeSwitch() {
       </Pressable>
       <Pressable
         onPress={() => switchMode("owner")}
-        style={[styles.item, mode === "owner" && styles.active]}
+        disabled={isModeSwitching || mode === "owner"}
+        style={[styles.item, mode === "owner" && styles.active, isModeSwitching && styles.disabled]}
       >
         <Text style={[styles.text, mode === "owner" && styles.activeText]}>
           Owner
@@ -36,4 +38,5 @@ const styles = StyleSheet.create({
   active: { backgroundColor: colors.primary },
   text: { fontSize: 11, fontWeight: "700", color: colors.secondaryText },
   activeText: { color: "#fff" },
+  disabled: { opacity: 0.65 },
 });

@@ -3,21 +3,26 @@
     "name": "LetRent",
     "slug": "letrent",
     "version": "1.0.0",
+    "icon": "./assets/images/logo.png",
+
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "plugins": ["expo-router"],
     "scheme": "letrent",
     "jsEngine": "hermes",
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "a0b282cf-24ee-4a19-bcef-4f1bf582983e"
       }
     },
+
     "android": {
       "package": "com.abhiabhishektr.letrent",
       "softwareKeyboardLayoutMode": "pan"
     },
+
     "androidStatusBar": {
       "translucent": false
     }
