@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
 import { Screen } from "./Screen";
 import { BottomNav } from "./BottomNav";
 import { useAuth } from "../context/AuthContext";
@@ -8,17 +8,23 @@ export function AppShell({
   children,
   active,
   style,
+  scroll = false,
 }: {
   children: React.ReactNode;
   active: string;
   style?: ViewStyle;
+  scroll?: boolean;
 }) {
   const { mode } = useAuth();
   return (
     <Screen style={styles.screen}>
-      <View style={[styles.body, style]}>{children}</View>
+      {scroll ? (
+        <ScrollView contentContainerStyle={[styles.scrollBody, style]} keyboardShouldPersistTaps="handled">
+          {children}
+        </ScrollView>
+      ) : <View style={[styles.body, style]}>{children}</View>}
       <BottomNav mode={mode} active={active} />
     </Screen>
   );
 }
-const styles = StyleSheet.create({ screen: { padding: 0 }, body: { flex: 1 } });
+const styles = StyleSheet.create({ screen: { padding: 0 }, body: { flex: 1 }, scrollBody: { flexGrow: 1 } });
