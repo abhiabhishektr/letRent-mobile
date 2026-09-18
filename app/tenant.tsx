@@ -3,7 +3,6 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
-import { BottomNav } from "../components/BottomNav";
 import { ModeSwitch } from "../components/ModeSwitch";
 import { rentRepository } from "../services/rentRepository";
 import { colors, spacing } from "../theme";
@@ -68,7 +67,6 @@ export default function Tenant() {
           ))}
         </View>
       </View>
-      <BottomNav mode="tenant" active="Home" />
     </Screen>
   );
 }

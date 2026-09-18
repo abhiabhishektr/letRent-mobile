@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme";
 const tenant = [
   ["⌂", "Home", "/tenant"],
@@ -22,20 +23,50 @@ export function BottomNav({
   active: string;
 }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const items = mode === "tenant" ? tenant : owner;
+  const animations = useRef(items.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    Animated.parallel(
+      items.map(([, label], index) =>
+        Animated.spring(animations[index], {
+          toValue: active === label ? 1 : 0,
+          useNativeDriver: true,
+          speed: 18,
+          bounciness: 6,
+        }),
+      ),
+    ).start();
+  }, [active, animations, items]);
+
   return (
-    <View style={styles.nav}>
-      {(mode === "tenant" ? tenant : owner).map(([icon, label, path]) => (
+    <View style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      {items.map(([icon, label, path], index) => (
         <Pressable
           key={label}
-          onPress={() => router.replace(path as never)}
+          onPress={() => {
+            if (active !== label) router.replace(path as never);
+          }}
           style={styles.item}
         >
-          <Text style={[styles.icon, active === label && styles.selected]}>
-            {icon}
-          </Text>
-          <Text style={[styles.label, active === label && styles.selected]}>
-            {label}
-          </Text>
+          <Animated.View
+            style={{
+              alignItems: "center",
+              opacity: animations[index].interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.72, 1],
+              }),
+              transform: [{ scale: animations[index].interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.08] }) }],
+            }}
+          >
+            <Text style={[styles.icon, active === label && styles.selected]}>
+              {icon}
+            </Text>
+            <Text style={[styles.label, active === label && styles.selected]}>
+              {label}
+            </Text>
+          </Animated.View>
         </Pressable>
       ))}
     </View>

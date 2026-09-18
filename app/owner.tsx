@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Screen } from "../components/Screen";
-import { BottomNav } from "../components/BottomNav";
 import { ModeSwitch } from "../components/ModeSwitch";
 import { rentRepository } from "../services/rentRepository";
 import { colors, spacing } from "../theme";
@@ -55,7 +54,6 @@ export default function Owner() {
           </View>
         ))}
       </View>
-      <BottomNav mode="owner" active="Home" />
     </Screen>
   );
 }
