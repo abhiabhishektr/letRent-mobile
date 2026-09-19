@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -20,131 +21,144 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { beginLogin } = useAuth();
   const router = useRouter();
 
+  const handleContinue = async () => {
+    if (phone.length < 10) {
+      Alert.alert("Invalid mobile number", "Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await beginLogin(phone);
+    } catch (error) {
+      Alert.alert(
+        "Unable to send OTP",
+        error instanceof Error ? error.message : "Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView style={styles.keyboardAvoidingView} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
-        automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-      >
-        <View style={styles.topSection}>
-          {/* Back Button */}
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [
-              styles.backButton,
-              pressed && styles.backButtonPressed,
-            ]}
-            hitSlop={8}
-          >
-            <AntDesign
-              name="left"
-              size={20}
-              color={colors.text}
-              style={
-                Platform.OS === "ios"
-                  ? { marginLeft: -2 }
-                  : undefined
-              }
-            />
-          </Pressable>
-
-          {/* Header */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.title}>Welcome back</Text>
-
-            <Text style={styles.subtitle}>
-              Enter your mobile number to continue
-            </Text>
-          </View>
-
-          {/* Phone Input */}
-          <View style={styles.phoneContainer}>
-            <Text style={styles.code}>+91</Text>
-
-            <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-              style={styles.input}
-              maxLength={10}
-              placeholder="00000 00000"
-              placeholderTextColor={colors.secondaryText}
-              selectionColor={colors.primary}
-              returnKeyType="done"
-            />
-          </View>
-
-          {/* Continue */}
-          <Button
-            title="Continue"
-            onPress={() => beginLogin(phone)}
-            style={styles.primaryButton}
-            disabled={phone.length < 10}
-          />
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-
-            <Text style={styles.orText}>OR</Text>
-
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Google */}
-          <Button
-            title="Continue with Google"
-            icon={
-              <Image
-                source={{
-                  uri: "https://img.icons8.com/color/48/000000/google-logo.png",
-                }}
-                style={styles.googleIcon}
-                resizeMode="contain"
-              />
-            }
-            outline
-            onPress={() => beginLogin(phone)}
-            style={styles.social}
-          />
-
-          {/* Apple */}
-          <Button
-            title={
-              Platform.OS === "ios"
-                ? "Continue with Apple"
-                : "Sign in with Apple"
-            }
-            icon={
-              <FontAwesome
-                name="apple"
-                size={22}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={styles.topSection}>
+            <Pressable
+              onPress={() => router.back()}
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && styles.backButtonPressed,
+              ]}
+              hitSlop={8}
+            >
+              <AntDesign
+                name="left"
+                size={20}
                 color={colors.text}
+                style={
+                  Platform.OS === "ios"
+                    ? { marginLeft: -2 }
+                    : undefined
+                }
               />
-            }
-            outline
-            onPress={() => beginLogin(phone)}
-            style={styles.social}
-          />
-        </View>
+            </Pressable>
 
-        {/* Footer */}
-        <Text style={styles.terms}>
-          By continuing, you agree to our{"\n"}
-          <Text style={styles.link}>Terms & Conditions</Text>
-          {" and "}
-          <Text style={styles.link}>Privacy Policy</Text>
-        </Text>
-      </ScrollView>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title}>Welcome back</Text>
+
+              <Text style={styles.subtitle}>
+                Enter your mobile number to continue
+              </Text>
+            </View>
+
+            <View style={styles.phoneContainer}>
+              <Text style={styles.code}>+91</Text>
+
+              <TextInput
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+                style={styles.input}
+                maxLength={10}
+                placeholder="00000 00000"
+                placeholderTextColor={colors.secondaryText}
+                selectionColor={colors.primary}
+                returnKeyType="done"
+              />
+            </View>
+
+            <Button
+              title={loading ? "Sending OTP..." : "Continue"}
+              onPress={handleContinue}
+              style={styles.primaryButton}
+              disabled={phone.length < 10 || loading}
+              loading={loading}
+            />
+
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+
+              <Text style={styles.orText}>OR</Text>
+
+              <View style={styles.dividerLine} />
+            </View>
+
+            <Button
+              title="Continue with Google"
+              icon={
+                <Image
+                  source={{
+                    uri: "https://img.icons8.com/color/48/000000/google-logo.png",
+                  }}
+                  style={styles.googleIcon}
+                  resizeMode="contain"
+                />
+              }
+              outline
+              onPress={handleContinue}
+              style={styles.social}
+            />
+
+            <Button
+              title={
+                Platform.OS === "ios"
+                  ? "Continue with Apple"
+                  : "Sign in with Apple"
+              }
+              icon={
+                <FontAwesome
+                  name="apple"
+                  size={22}
+                  color={colors.text}
+                />
+              }
+              outline
+              onPress={handleContinue}
+              style={styles.social}
+            />
+          </View>
+
+          <Text style={styles.terms}>
+            By continuing, you agree to our{"\n"}
+            <Text style={styles.link}>Terms & Conditions</Text>
+            {" and "}
+            <Text style={styles.link}>Privacy Policy</Text>
+          </Text>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

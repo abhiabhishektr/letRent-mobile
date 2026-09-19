@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Alert, 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
   Platform,
   Pressable,
   KeyboardAvoidingView,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -21,85 +21,120 @@ import { useAuth } from "../context/AuthContext";
 const OTP_LENGTH = 6;
 
 export default function Otp() {
-  const { verifyOtp } = useAuth();
+  const { verifyOtp, resendOtp, pendingPhone } = useAuth();
   const router = useRouter();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  
-  // FIX: Added <TextInput> type to useRef
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendAfter, setResendAfter] = useState<number | null>(null);
+
   const inputRef = useRef<TextInput>(null);
 
-  // Auto-focus the hidden input when the screen mounts
   useEffect(() => {
     const timeout = setTimeout(() => {
       inputRef.current?.focus();
-    }, 400); // Slight delay for smooth screen transition
+    }, 400);
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    if (resendAfter === null || resendAfter <= 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setResendAfter((current) => (current !== null ? Math.max(0, current - 1) : current));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resendAfter]);
 
   const submit = async () => {
     if (otp.length < OTP_LENGTH) {
       Alert.alert("Missing OTP", "Please enter the full 6-digit code.");
       return;
     }
+
     setLoading(true);
     try {
       await verifyOtp(otp);
     } catch (error) {
       Alert.alert(
         "Verification failed",
-        error instanceof Error ? error.message : "Try again."
+        error instanceof Error ? error.message : "Try again.",
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResend = async () => {
+    if (resendLoading || (resendAfter !== null && resendAfter > 0)) {
+      return;
+    }
+
+    setResendLoading(true);
+    try {
+      const seconds = await resendOtp();
+      setResendAfter(seconds > 0 ? seconds : 0);
+    } catch (error) {
+      Alert.alert(
+        "Resend failed",
+        error instanceof Error ? error.message : "Please try again.",
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const focusOtpInput = () => {
-    // On Android, dismissing the keyboard does not always blur the hidden input.
-    // A no-op focus call then cannot re-open it, so reset native focus first.
     inputRef.current?.blur();
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
+  const resendLabel =
+    resendLoading
+      ? "Resending OTP..."
+      : resendAfter !== null && resendAfter > 0
+        ? `Resend OTP in ${resendAfter}s`
+        : "Resend OTP";
+
   return (
     <SafeAreaView style={styles.screen}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
           <View style={styles.topSection}>
-            {/* Back Button matching standard UI */}
-            <Pressable 
-              onPress={() => router.back()} 
+            <Pressable
+              onPress={() => router.back()}
               style={({ pressed }) => [
                 styles.backButton,
-                pressed && styles.backButtonPressed
+                pressed && styles.backButtonPressed,
               ]}
               hitSlop={8}
             >
-              <AntDesign 
-                name="left" 
-                size={20} 
-                color={colors.text} 
-                style={Platform.OS === 'ios' ? { marginLeft: -2 } : {}} 
+              <AntDesign
+                name="left"
+                size={20}
+                color={colors.text}
+                style={Platform.OS === "ios" ? { marginLeft: -2 } : {}}
               />
             </Pressable>
 
             <View style={styles.headerContainer}>
               <Text style={styles.title}>Verify your login</Text>
               <Text style={styles.subtitle}>
-                We've sent a 6-digit code to your mobile number.
+                We&apos;ve sent a 6-digit code to {pendingPhone || "your mobile number"}.
               </Text>
             </View>
 
-            {/* Custom OTP Input Boxes */}
             <Pressable style={styles.otpContainer} onPressIn={focusOtpInput}>
               {Array(OTP_LENGTH).fill(0).map((_, index) => {
                 const char = otp[index] || "";
@@ -109,8 +144,8 @@ export default function Otp() {
                 const isFilled = !!char;
 
                 return (
-                  <View 
-                    key={index} 
+                  <View
+                    key={index}
                     style={[
                       styles.otpCell,
                       isFilled && styles.otpCellFilled,
@@ -118,33 +153,40 @@ export default function Otp() {
                     ]}
                   >
                     <Text style={styles.otpText}>{char}</Text>
-                    {/* Simulated blinking cursor for active cell */}
                     {isActive && !char && <View style={styles.cursor} />}
                   </View>
                 );
               })}
             </Pressable>
 
-            {/* Hidden Input field handling native keyboard & auto-fill */}
             <TextInput
               ref={inputRef}
               value={otp}
-              onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, ''))}
+              onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, ""))}
               maxLength={OTP_LENGTH}
               keyboardType="number-pad"
-              textContentType="oneTimeCode" // iOS SMS Auto-fill
-              autoComplete="sms-otp" // Android SMS Auto-fill
+              textContentType="oneTimeCode"
+              autoComplete="sms-otp"
               showSoftInputOnFocus
               style={styles.hiddenInput}
               caretHidden={true}
             />
 
-            <Button 
-              title="Verify OTP" 
-              onPress={submit} 
-              loading={loading} 
+            <Button
+              title={loading ? "Verifying OTP..." : "Verify OTP"}
+              onPress={submit}
+              loading={loading}
               disabled={otp.length !== OTP_LENGTH || loading}
               style={styles.primaryButton}
+            />
+
+            <Button
+              title={resendLabel}
+              onPress={handleResend}
+              outline
+              loading={resendLoading}
+              disabled={resendLoading || (resendAfter !== null && resendAfter > 0)}
+              style={styles.resendButton}
             />
           </View>
         </ScrollView>
@@ -165,7 +207,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: Platform.OS === 'ios' ? spacing.xl : spacing.lg,
+    paddingBottom: Platform.OS === "ios" ? spacing.xl : spacing.lg,
   },
   topSection: {
     flex: 1,
@@ -174,11 +216,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#F4F4F6", 
+    backgroundColor: "#F4F4F6",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.xl,
-    marginTop: Platform.OS === 'android' ? spacing.md : 0,
+    marginTop: Platform.OS === "android" ? spacing.md : 0,
   },
   backButtonPressed: {
     opacity: 0.6,
@@ -188,10 +230,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   title: {
-    fontSize: Platform.OS === 'ios' ? 28 : 26, 
-    fontWeight: Platform.OS === 'ios' ? "700" : "bold",
+    fontSize: Platform.OS === "ios" ? 28 : 26,
+    fontWeight: Platform.OS === "ios" ? "700" : "bold",
     color: colors.text,
-    letterSpacing: Platform.OS === 'ios' ? 0.3 : 0, 
+    letterSpacing: Platform.OS === "ios" ? 0.3 : 0,
     marginBottom: spacing.xs,
   },
   subtitle: {
@@ -203,7 +245,7 @@ const styles = StyleSheet.create({
   otpContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: spacing.xxl, 
+    marginBottom: spacing.xxl,
     width: "100%",
   },
   otpCell: {
@@ -212,16 +254,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: "#EAEAEC", 
+    borderColor: "#EAEAEC",
     alignItems: "center",
     justifyContent: "center",
   },
   otpCellFilled: {
-    borderColor: "#D1D1D6", 
-    backgroundColor: "#F9F9FA", 
+    borderColor: "#D1D1D6",
+    backgroundColor: "#F9F9FA",
   },
   otpCellActive: {
-    borderColor: colors.primary, 
+    borderColor: colors.primary,
     backgroundColor: "#FFFFFF",
     ...Platform.select({
       ios: {
@@ -257,16 +299,22 @@ const styles = StyleSheet.create({
   primaryButton: {
     borderRadius: 16,
     height: 56,
+    marginBottom: spacing.md,
     ...Platform.select({
       ios: {
         shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 3,
+        elevation: 4,
       },
     }),
+  },
+  resendButton: {
+    borderRadius: 16,
+    height: 52,
+    marginTop: spacing.sm,
   },
 });
