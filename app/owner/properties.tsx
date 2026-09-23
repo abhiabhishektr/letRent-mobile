@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   Animated,
   Modal,
   Pressable,
@@ -10,8 +11,8 @@ import {
 import { useFocusEffect, useRouter } from 'expo-router';
 import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
-import { Property, rentRepository } from '../../services/rentRepository';
 import { colors, spacing } from '../../theme';
+import { getProperties, PropertyResponse } from '../../services/propertyApi';
 
 const PROPERTY_TYPE_OPTIONS = [
   { value: 'HOSTEL', label: 'Hostel', icon: '🏢' },
@@ -22,16 +23,22 @@ const PROPERTY_TYPE_OPTIONS = [
 
 export default function Properties() {
   const [search, setSearch] = useState('');
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PropertyResponse[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const router = useRouter();
   const sheetTranslate = useRef(new Animated.Value(260)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
   const loadProperties = useCallback(async () => {
-    const next = await rentRepository.getProperties({ search });
-    setProperties(next);
-  }, [search]);
+    try {
+      const next = await getProperties();
+      setProperties(next);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to load properties.';
+      Alert.alert('Unable to load properties', message);
+      setProperties([]);
+    }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -76,6 +83,16 @@ export default function Properties() {
     router.push({ pathname: '/owner/properties/add', params: { propertyType: value } });
   };
 
+  const handleView = (property: PropertyResponse) => {
+    router.push({ pathname: '/owner/properties/[id]', params: { id: String(property.id) } });
+  };
+
+  const filteredProperties = properties.filter((property) => {
+    if (!search.trim()) return true;
+    const query = search.toLowerCase();
+    return `${property.name} ${property.address} ${property.city} ${property.state}`.toLowerCase().includes(query);
+  });
+
   return <AppShell active="Properties" scroll style={styles.content}>
     <View style={styles.headerRow}>
       <Text onPress={() => router.back()} style={styles.back}>‹</Text>
@@ -86,10 +103,18 @@ export default function Properties() {
     </View>
     <Text style={styles.sub}>12 properties · 24 units</Text>
     <SearchFilterBar query={search} onQueryChange={setSearch} placeholder="Search properties or location" />
-    {properties.map((property) => <View key={property.id} style={styles.card}>
-      <View style={styles.icon}><Text>⌂</Text></View><View style={styles.cardContent}><Text style={styles.name}>{property.name}</Text><Text style={styles.meta}>{property.address}</Text><Text style={styles.meta}>{property.units} · {property.occupied}</Text></View><Text style={styles.arrow}>›</Text>
+    {filteredProperties.map((property) => <View key={property.id} style={styles.card}>
+      <Pressable onPress={() => handleView(property)} style={styles.cardBody}>
+        <View style={styles.icon}><Text>⌂</Text></View>
+        <View style={styles.cardContent}>
+          <Text style={styles.name}>{property.name}</Text>
+          <Text style={styles.meta}>{property.address}</Text>
+          <Text style={styles.meta}>{property.city}, {property.state}</Text>
+        </View>
+        <Text style={styles.arrow}>›</Text>
+      </Pressable>
     </View>)}
-    {!properties.length ? <View style={styles.empty}><Text style={styles.emptyTitle}>No properties found</Text><Text style={styles.emptyCopy}>Try searching by property name or location.</Text></View> : null}
+    {!filteredProperties.length ? <View style={styles.empty}><Text style={styles.emptyTitle}>No properties found</Text><Text style={styles.emptyCopy}>Try searching by property name or location.</Text></View> : null}
 
     <Modal transparent visible={showAddModal} animationType="fade" onRequestClose={() => setShowAddModal(false)}>
       <Pressable style={styles.modalBackdrop} onPress={() => setShowAddModal(false)}>
@@ -121,7 +146,8 @@ const styles = StyleSheet.create({
   addButton:{width:34,height:34,borderRadius:17,backgroundColor:'#eef5ff',alignItems:'center',justifyContent:'center',marginTop:spacing.sm},
   addIcon:{fontSize:24,color:colors.primary,fontWeight:'700'},
   sub:{color:colors.secondaryText,fontSize:13,marginTop:4,marginBottom:spacing.lg},
-  card:{backgroundColor:'#fff',borderWidth:1,borderColor:'#edf0f5',borderRadius:12,padding:spacing.md,marginBottom:spacing.sm,flexDirection:'row',alignItems:'center',gap:12},
+  card:{backgroundColor:'#fff',borderWidth:1,borderColor:'#edf0f5',borderRadius:12,padding:spacing.md,marginBottom:spacing.sm,shadowColor:'#49617D',shadowOpacity:0.06,shadowRadius:8,elevation:2},
+  cardBody:{flexDirection:'row',alignItems:'center',gap:12},
   icon:{backgroundColor:'#eaf9ef',padding:12,borderRadius:10},
   cardContent:{flex:1},
   name:{fontSize:15,fontWeight:'800'},

@@ -13,7 +13,12 @@ import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
 import { Screen } from "../../../components/Screen";
 import { colors, spacing, typography } from "../../../theme";
-import { createProperty, lookupPinCode, PropertyTypeValue } from "../../../services/propertyApi";
+import {
+  createProperty,
+  lookupPinCode,
+  PropertyTypeValue,
+  updateProperty,
+} from "../../../services/propertyApi";
 import { rentRepository } from "../../../services/rentRepository";
 
 const PROPERTY_TYPE_LABELS: Record<PropertyTypeValue, string> = {
@@ -32,7 +37,17 @@ const normalizeType = (value?: string | string[]): PropertyTypeValue => {
 
 export default function AddPropertyDetails() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ propertyType?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    propertyType?: string | string[];
+    mode?: string | string[];
+    propertyId?: string | string[];
+    name?: string | string[];
+    address?: string | string[];
+    city?: string | string[];
+    state?: string | string[];
+    pincode?: string | string[];
+  }>();
+  const isEditMode = params.mode === "edit";
   const propertyType = normalizeType(params.propertyType);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -44,6 +59,17 @@ export default function AddPropertyDetails() {
   const [locationLocked, setLocationLocked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
+
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    setName(Array.isArray(params.name) ? params.name[0] ?? "" : params.name ?? "");
+    setAddress(Array.isArray(params.address) ? params.address[0] ?? "" : params.address ?? "");
+    setPincode(Array.isArray(params.pincode) ? params.pincode[0] ?? "" : params.pincode ?? "");
+    setCity(Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "");
+    setState(Array.isArray(params.state) ? params.state[0] ?? "" : params.state ?? "");
+    setLocationLocked(Boolean((Array.isArray(params.city) ? params.city[0] : params.city) || (Array.isArray(params.state) ? params.state[0] : params.state)));
+  }, [isEditMode, params.address, params.city, params.name, params.pincode, params.state]);
   const checkScale = useRef(new Animated.Value(0.7)).current;
   const checkOpacity = useRef(new Animated.Value(0.2)).current;
 
@@ -138,23 +164,38 @@ export default function AddPropertyDetails() {
         pincode: pincode.trim(),
       };
 
-      const created = await createProperty(payload);
-      await rentRepository.addProperty({
-        id: String(created.id ?? Date.now()),
-        name: created.name,
-        address: created.address,
-        units: "1 unit",
-        occupied: "0 occupied",
-        property_type: created.property_type,
-        city: created.city,
-        state: created.state,
-        pincode: created.pincode,
-      });
+      if (isEditMode && params.propertyId) {
+        const updated = await updateProperty(String(params.propertyId), payload);
+        await rentRepository.addProperty({
+          id: String(updated.id ?? params.propertyId),
+          name: updated.name,
+          address: updated.address,
+          units: "1 unit",
+          occupied: "0 occupied",
+          property_type: updated.property_type,
+          city: updated.city,
+          state: updated.state,
+          pincode: updated.pincode,
+        });
+      } else {
+        const created = await createProperty(payload);
+        await rentRepository.addProperty({
+          id: String(created.id ?? Date.now()),
+          name: created.name,
+          address: created.address,
+          units: "1 unit",
+          occupied: "0 occupied",
+          property_type: created.property_type,
+          city: created.city,
+          state: created.state,
+          pincode: created.pincode,
+        });
+      }
 
       setSuccessVisible(true);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to add property.";
-      Alert.alert("Unable to add property", message);
+      const message = error instanceof Error ? error.message : isEditMode ? "Unable to update property." : "Unable to add property.";
+      Alert.alert(isEditMode ? "Unable to update property" : "Unable to add property", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -175,9 +216,9 @@ export default function AddPropertyDetails() {
           >
             <Text style={styles.successCheck}>✓</Text>
           </Animated.View>
-          <Text style={styles.successTitle}>Property Added</Text>
+          <Text style={styles.successTitle}>{isEditMode ? "Property Updated" : "Property Added"}</Text>
           <Text style={styles.successMessage}>
-            {name.trim() || "Your property"} has been added successfully.
+            {name.trim() || "Your property"} has been {isEditMode ? "updated" : "added"} successfully.
           </Text>
         </View>
       </Screen>
@@ -187,7 +228,7 @@ export default function AddPropertyDetails() {
   return (
     <Screen scroll style={styles.screen}>
       <Text onPress={() => router.back()} style={styles.back}>‹</Text>
-      <Text style={styles.title}>Add Property</Text>
+      <Text style={styles.title}>{isEditMode ? "Edit Property" : "Add Property"}</Text>
       <Text style={styles.typeLabel}>Property type</Text>
       <View style={styles.typePill}>
         <Text style={styles.typePillText}>{PROPERTY_TYPE_LABELS[propertyType]}</Text>
@@ -247,7 +288,7 @@ export default function AddPropertyDetails() {
 
       <View style={styles.footer}>
         <Button
-          title={isSubmitting ? "Adding..." : "Add Property"}
+          title={isSubmitting ? (isEditMode ? "Updating..." : "Adding...") : (isEditMode ? "Save Changes" : "Add Property")}
           onPress={handleSubmit}
           loading={isSubmitting}
           disabled={isSubmitting}

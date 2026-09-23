@@ -68,6 +68,47 @@ export async function lookupPinCode(
   }
 }
 
+export async function getProperties(): Promise<PropertyResponse[]> {
+  const accessToken = await tokenStorage.getAccessToken();
+  if (!accessToken) {
+    throw new Error("Authentication required. Please log in again.");
+  }
+
+  try {
+    const response = await apiClient.get("/api/properties/", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const payload = response.data as PropertyResponse[] | undefined;
+    return Array.isArray(payload) ? payload : [];
+  } catch (error) {
+    const message = getErrorMessage(error, "Unable to load properties.");
+    throw new Error(message);
+  }
+}
+
+export async function getProperty(id: number | string): Promise<PropertyResponse> {
+  const accessToken = await tokenStorage.getAccessToken();
+  if (!accessToken) {
+    throw new Error("Authentication required. Please log in again.");
+  }
+
+  try {
+    const response = await apiClient.get(`/api/properties/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data as PropertyResponse;
+  } catch (error) {
+    const message = getErrorMessage(error, "Unable to load property.");
+    throw new Error(message);
+  }
+}
+
 export async function createProperty(
   payload: PropertyCreateInput,
 ): Promise<PropertyResponse> {
@@ -87,6 +128,48 @@ export async function createProperty(
     return response.data as PropertyResponse;
   } catch (error) {
     const message = getErrorMessage(error, "Unable to add property.");
+    throw new Error(message);
+  }
+}
+
+export async function updateProperty(
+  id: number | string,
+  payload: Partial<PropertyCreateInput>,
+): Promise<PropertyResponse> {
+  const accessToken = await tokenStorage.getAccessToken();
+  if (!accessToken) {
+    throw new Error("Authentication required. Please log in again.");
+  }
+
+  try {
+    const response = await apiClient.patch(`/api/properties/${id}/`, payload, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data as PropertyResponse;
+  } catch (error) {
+    const message = getErrorMessage(error, "Unable to update property.");
+    throw new Error(message);
+  }
+}
+
+export async function deleteProperty(id: number | string): Promise<void> {
+  const accessToken = await tokenStorage.getAccessToken();
+  if (!accessToken) {
+    throw new Error("Authentication required. Please log in again.");
+  }
+
+  try {
+    await apiClient.delete(`/api/properties/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch (error) {
+    const message = getErrorMessage(error, "Unable to delete property.");
     throw new Error(message);
   }
 }
