@@ -7,15 +7,25 @@ export type Collection = {
   date: string;
   status: "Paid" | "Due" | "Late Fee";
 };
-export type Property = { id: string; name: string; address: string; units: string; occupied: string };
+export type Property = {
+  id: string;
+  name: string;
+  address: string;
+  units: string;
+  occupied: string;
+  property_type?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+};
 export type OwnerTenant = Collection & { property: string; dateKey: string };
 export type PropertyQuery = { search?: string };
 export type TenantQuery = { search?: string; status?: OwnerTenant['status'] | ''; date?: string; property?: string };
 
 const PROPERTIES: Property[] = [
-  { id: 'property-1', name: 'Green View Apartments', address: 'Koramangala, Bengaluru', units: '8 units', occupied: '7 occupied' },
-  { id: 'property-2', name: 'Lake Side Residency', address: 'HSR Layout, Bengaluru', units: '6 units', occupied: '5 occupied' },
-  { id: 'property-3', name: 'Palm Grove Villa', address: 'Indiranagar, Bengaluru', units: '2 units', occupied: '2 occupied' },
+  { id: 'property-1', name: 'Green View Apartments', address: 'Koramangala, Bengaluru', units: '8 units', occupied: '7 occupied', property_type: 'RESIDENTIAL' },
+  { id: 'property-2', name: 'Lake Side Residency', address: 'HSR Layout, Bengaluru', units: '6 units', occupied: '5 occupied', property_type: 'RESIDENTIAL' },
+  { id: 'property-3', name: 'Palm Grove Villa', address: 'Indiranagar, Bengaluru', units: '2 units', occupied: '2 occupied', property_type: 'RESIDENTIAL' },
 ];
 const OWNER_TENANTS: OwnerTenant[] = [
   { id: 'c1', tenant: 'Rahul Sharma', unit: 'Unit 101', property: 'Green View Apartments', amount: 12000, date: '1 Sep 2025', dateKey: '2025-09', status: 'Paid' },
@@ -55,7 +65,22 @@ export const rentRepository = {
   },
   async getProperties(query: PropertyQuery = {}): Promise<Property[]> {
     const search = query.search?.trim().toLowerCase() ?? '';
-    return !search ? PROPERTIES : PROPERTIES.filter((property) => `${property.name} ${property.address}`.toLowerCase().includes(search));
+    return !search ? [...PROPERTIES] : PROPERTIES.filter((property) => `${property.name} ${property.address}`.toLowerCase().includes(search));
+  },
+  async addProperty(property: Omit<Property, 'id' | 'units' | 'occupied'> & Partial<Pick<Property, 'id' | 'units' | 'occupied'>>): Promise<Property> {
+    const created: Property = {
+      id: property.id ?? `property-${Date.now()}`,
+      name: property.name,
+      address: property.address,
+      units: property.units ?? '1 unit',
+      occupied: property.occupied ?? '0 occupied',
+      property_type: property.property_type,
+      city: property.city,
+      state: property.state,
+      pincode: property.pincode,
+    };
+    PROPERTIES.unshift(created);
+    return created;
   },
   async getOwnerTenants(query: TenantQuery = {}): Promise<OwnerTenant[]> {
     const search = query.search?.trim().toLowerCase() ?? '';
