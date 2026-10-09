@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await tokenStorage.setTokens("demo-access-token", "demo-refresh-token");
       await storage.set(SESSION_KEY, fallbackUser);
       setCurrentUser(fallbackUser);
-      router.replace("/tenant");
+      router.replace("/select-role");
       return;
     }
 
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     await storage.set(SESSION_KEY, nextUser);
     setCurrentUser(nextUser);
-    router.replace("/tenant");
+    router.replace("/select-role");
   };
 
   const resendOtp = async () => {
