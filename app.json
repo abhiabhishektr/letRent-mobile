@@ -7,10 +7,10 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "scheme": "letrent",
-    "jsEngine": "hermes",
     "extra": {
       "router": {},
       "apiBaseUrl": "http://13.235.78.162",
@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.abhiabhishektr.letrent",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "resize"
     },
     "androidStatusBar": {
       "translucent": false

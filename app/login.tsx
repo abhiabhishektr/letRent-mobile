@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 
+import { AnimatedBottomSheet } from "../components/AnimatedBottomSheet";
 import { Button } from "../components/Button";
 import { colors, spacing } from "../theme";
 import { useAuth } from "../context/AuthContext";
@@ -25,6 +26,14 @@ export default function Login() {
 
   const { beginLogin } = useAuth();
   const router = useRouter();
+
+  const closeLogin = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
 
   const handleContinue = async () => {
     if (phone.length < 10) {
@@ -46,121 +55,119 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
-      <KeyboardAvoidingView style={styles.keyboardAvoidingView} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
-          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
+    <AnimatedBottomSheet onClose={closeLogin}>
+      <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoidingView}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View style={styles.topSection}>
-            <Pressable
-              onPress={() => router.back()}
-              style={({ pressed }) => [
-                styles.backButton,
-                pressed && styles.backButtonPressed,
-              ]}
-              hitSlop={8}
-            >
-              <AntDesign
-                name="left"
-                size={20}
-                color={colors.text}
-                style={
-                  Platform.OS === "ios"
-                    ? { marginLeft: -2 }
-                    : undefined
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+            automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View style={styles.topSection}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close login"
+                onPress={closeLogin}
+                style={({ pressed }) => [
+                  styles.backButton,
+                  pressed && styles.backButtonPressed,
+                ]}
+                hitSlop={8}
+              >
+                <AntDesign name="close" size={20} color={colors.text} />
+              </Pressable>
+
+              <View style={styles.headerContainer}>
+                <Text style={styles.title}>Welcome back</Text>
+
+                <Text style={styles.subtitle}>
+                  Enter your mobile number to continue
+                </Text>
+              </View>
+
+              <View style={styles.phoneContainer}>
+                <Text style={styles.code}>+91</Text>
+
+                <TextInput
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                  style={styles.input}
+                  maxLength={10}
+                  placeholder="00000 00000"
+                  placeholderTextColor={colors.secondaryText}
+                  selectionColor={colors.primary}
+                  returnKeyType="done"
+                />
+              </View>
+
+              <Button
+                title={loading ? "Sending OTP..." : "Continue"}
+                onPress={handleContinue}
+                style={styles.primaryButton}
+                disabled={phone.length < 10 || loading}
+                loading={loading}
+              />
+
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+
+                <Text style={styles.orText}>OR</Text>
+
+                <View style={styles.dividerLine} />
+              </View>
+
+              <Button
+                title="Continue with Google"
+                icon={
+                  <Image
+                    source={{
+                      uri: "https://img.icons8.com/color/48/000000/google-logo.png",
+                    }}
+                    style={styles.googleIcon}
+                    resizeMode="contain"
+                  />
                 }
+                outline
+                onPress={handleContinue}
+                style={styles.social}
               />
-            </Pressable>
 
-            <View style={styles.headerContainer}>
-              <Text style={styles.title}>Welcome back</Text>
-
-              <Text style={styles.subtitle}>
-                Enter your mobile number to continue
-              </Text>
-            </View>
-
-            <View style={styles.phoneContainer}>
-              <Text style={styles.code}>+91</Text>
-
-              <TextInput
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-                style={styles.input}
-                maxLength={10}
-                placeholder="00000 00000"
-                placeholderTextColor={colors.secondaryText}
-                selectionColor={colors.primary}
-                returnKeyType="done"
+              <Button
+                title={
+                  Platform.OS === "ios"
+                    ? "Continue with Apple"
+                    : "Sign in with Apple"
+                }
+                icon={
+                  <FontAwesome
+                    name="apple"
+                    size={22}
+                    color={colors.text}
+                  />
+                }
+                outline
+                onPress={handleContinue}
+                style={styles.social}
               />
             </View>
 
-            <Button
-              title={loading ? "Sending OTP..." : "Continue"}
-              onPress={handleContinue}
-              style={styles.primaryButton}
-              disabled={phone.length < 10 || loading}
-              loading={loading}
-            />
-
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-
-              <Text style={styles.orText}>OR</Text>
-
-              <View style={styles.dividerLine} />
-            </View>
-
-            <Button
-              title="Continue with Google"
-              icon={
-                <Image
-                  source={{
-                    uri: "https://img.icons8.com/color/48/000000/google-logo.png",
-                  }}
-                  style={styles.googleIcon}
-                  resizeMode="contain"
-                />
-              }
-              outline
-              onPress={handleContinue}
-              style={styles.social}
-            />
-
-            <Button
-              title={
-                Platform.OS === "ios"
-                  ? "Continue with Apple"
-                  : "Sign in with Apple"
-              }
-              icon={
-                <FontAwesome
-                  name="apple"
-                  size={22}
-                  color={colors.text}
-                />
-              }
-              outline
-              onPress={handleContinue}
-              style={styles.social}
-            />
-          </View>
-
-          <Text style={styles.terms}>
-            By continuing, you agree to our{"\n"}
-            <Text style={styles.link}>Terms & Conditions</Text>
-            {" and "}
-            <Text style={styles.link}>Privacy Policy</Text>
-          </Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            <Text style={styles.terms}>
+              By continuing, you agree to our{"\n"}
+              <Text style={styles.link}>Terms & Conditions</Text>
+              {" and "}
+              <Text style={styles.link}>Privacy Policy</Text>
+            </Text>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </AnimatedBottomSheet>
   );
 }
 
