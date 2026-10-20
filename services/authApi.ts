@@ -3,6 +3,7 @@ import type {
   ResendOtpResponse,
   SendOtpResponse,
   VerifyOtpResponse,
+  GoogleAuthResponse,
 } from "../types/auth";
 
 function toFormData(data: Record<string, string | number | boolean | undefined | null>) {
@@ -29,6 +30,31 @@ function assertSuccess<T extends { success?: boolean; message?: string }>(
 }
 
 export const authApi = {
+  async googleLogin(
+    idToken: string,
+    googleAccessToken: string,
+  ): Promise<GoogleAuthResponse> {
+    try {
+      const response = await apiClient.post(
+        "/api/auth/google/",
+        { id_token: idToken },
+        {
+          headers: {
+            Authorization: `Bearer ${googleAccessToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return assertSuccess(
+        response.data as GoogleAuthResponse,
+        "Google sign-in failed.",
+      );
+    } catch (error) {
+      throw new Error(getErrorMessage(error, "Google sign-in failed."));
+    }
+  },
+
   async sendOtp(mobileNumber: string): Promise<SendOtpResponse> {
     try {
       const response = await apiClient.post(

@@ -11,6 +11,14 @@ npx expo start
 
 Scan the QR code with Expo Go.
 
+## Google sign-in
+
+The web OAuth client ID is configured in `app.json`. Add separate Android and iOS
+OAuth client IDs to `googleAndroidClientId` and `googleIosClientId` in that file
+before enabling Google sign-in on those platforms. The Google OAuth client must
+also allow the redirect URI used by the app. The Google sign-in endpoint exchanges
+the returned ID token and Google access token for the app's session tokens.
+
 ## Demo accounts
 
 Admin:

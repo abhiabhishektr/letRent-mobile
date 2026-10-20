@@ -12,6 +12,7 @@ type AuthContextValue = {
   isModeSwitching: boolean;
   pendingPhone: string;
   mode: AppMode;
+  loginWithGoogle: (idToken: string, googleAccessToken: string) => Promise<void>;
   beginLogin: (phone: string) => Promise<void>;
   verifyOtp: (otp: string) => Promise<void>;
   resendOtp: () => Promise<number>;
@@ -68,6 +69,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setPendingPhone(normalizedPhone);
     await authApi.sendOtp(normalizedPhone);
     router.push("/otp");
+  };
+
+  const loginWithGoogle = async (
+    idToken: string,
+    googleAccessToken: string,
+  ) => {
+    const response = await authApi.googleLogin(idToken, googleAccessToken);
+    const accessToken =
+      response.tokens?.access ?? response.access ?? response.access_token;
+    const refreshToken =
+      response.tokens?.refresh ?? response.refresh ?? response.refresh_token;
+
+    if (!accessToken || !refreshToken) {
+      throw new Error(response.message || "Google sign-in returned no session tokens.");
+    }
+
+    const user = response.user;
+    const nextUser: User = {
+      id: String(user?.id ?? user?.user_id ?? user?.email ?? "google-user"),
+      name: user?.name || user?.email || "Google User",
+      phone: user?.mobile_number ?? "",
+      mode: "tenant",
+    };
+
+    await tokenStorage.setTokens(accessToken, refreshToken);
+    await storage.set(SESSION_KEY, nextUser);
+    setCurrentUser(nextUser);
+    router.replace("/select-role");
   };
 
   const verifyOtp = async (otp: string) => {
@@ -177,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isModeSwitching,
         pendingPhone,
         mode: currentUser?.mode ?? "tenant",
+        loginWithGoogle,
         beginLogin,
         verifyOtp,
         resendOtp,

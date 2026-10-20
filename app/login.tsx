@@ -14,18 +14,52 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import Constants from "expo-constants";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  exchangeCodeAsync,
+  ResponseType,
+} from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
 
 import { AnimatedBottomSheet } from "../components/AnimatedBottomSheet";
 import { Button } from "../components/Button";
 import { colors, spacing } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
+WebBrowser.maybeCompleteAuthSession();
+
 export default function Login() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
-  const { beginLogin } = useAuth();
+  const { beginLogin, loginWithGoogle } = useAuth();
   const router = useRouter();
+  const extra = Constants.expoConfig?.extra;
+  const googleWebClientId =
+    typeof extra?.googleWebClientId === "string" ? extra.googleWebClientId : "";
+  const googleAndroidClientId =
+    typeof extra?.googleAndroidClientId === "string"
+      ? extra.googleAndroidClientId
+      : "";
+  const googleIosClientId =
+    typeof extra?.googleIosClientId === "string" ? extra.googleIosClientId : "";
+  const oauthClientId =
+    Platform.OS === "android"
+      ? googleAndroidClientId || googleWebClientId
+      : Platform.OS === "ios"
+        ? googleIosClientId || googleWebClientId
+        : googleWebClientId;
+  const [googleRequest, , promptGoogleSignIn] = Google.useAuthRequest({
+    webClientId: googleWebClientId,
+    androidClientId: googleAndroidClientId || googleWebClientId,
+    iosClientId: googleIosClientId || googleWebClientId,
+    responseType: ResponseType.Code,
+    shouldAutoExchangeCode: false,
+    scopes: ["openid", "profile", "email"],
+    selectAccount: true,
+  });
 
   const closeLogin = () => {
     if (router.canGoBack()) {
@@ -51,6 +85,70 @@ export default function Login() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (Platform.OS === "android" && !googleAndroidClientId) {
+      Alert.alert(
+        "Google sign-in setup required",
+        "Add an Android OAuth client ID in app.json to enable Google sign-in on Android.",
+      );
+      return;
+    }
+
+    if (Platform.OS === "ios" && !googleIosClientId) {
+      Alert.alert(
+        "Google sign-in setup required",
+        "Add an iOS OAuth client ID in app.json to enable Google sign-in on iOS.",
+      );
+      return;
+    }
+
+    if (!googleRequest) {
+      Alert.alert("Google sign-in", "Please wait for Google sign-in to finish loading.");
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      const result = await promptGoogleSignIn();
+      if (result.type === "cancel" || result.type === "dismiss") {
+        return;
+      }
+      if (result.type !== "success") {
+        throw new Error("Google sign-in was not completed. Please try again.");
+      }
+
+      const code = result.params.code;
+      if (!code) {
+        throw new Error("Google did not return an authorization code.");
+      }
+
+      const tokens = await exchangeCodeAsync(
+        {
+          clientId: oauthClientId,
+          code,
+          redirectUri: googleRequest.redirectUri,
+          extraParams: googleRequest.codeVerifier
+            ? { code_verifier: googleRequest.codeVerifier }
+            : {},
+        },
+        Google.discovery,
+      );
+
+      if (!tokens.idToken || !tokens.accessToken) {
+        throw new Error("Google did not return the required sign-in tokens.");
+      }
+
+      await loginWithGoogle(tokens.idToken, tokens.accessToken);
+    } catch (error) {
+      Alert.alert(
+        "Google sign-in failed",
+        error instanceof Error ? error.message : "Please try again.",
+      );
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -124,7 +222,7 @@ export default function Login() {
               </View>
 
               <Button
-                title="Continue with Google"
+                title={googleLoading ? "Connecting to Google..." : "Continue with Google"}
                 icon={
                   <Image
                     source={{
@@ -135,7 +233,9 @@ export default function Login() {
                   />
                 }
                 outline
-                onPress={handleContinue}
+                onPress={handleGoogleSignIn}
+                loading={googleLoading}
+                disabled={!googleRequest || googleLoading}
                 style={styles.social}
               />
 

@@ -8,12 +8,16 @@
     "userInterfaceStyle": "light",
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-web-browser"
     ],
     "scheme": "letrent",
     "extra": {
       "router": {},
-      "apiBaseUrl": "http://13.235.78.162",
+      "apiBaseUrl": "https://letrentapi.anwarmusthafa.com",
+      "googleWebClientId": "874478775153-54qj897q3sfsqnvfthd11hb0gnurvmtp.apps.googleusercontent.com",
+      "googleAndroidClientId": "",
+      "googleIosClientId": "",
       "eas": {
         "projectId": "a0b282cf-24ee-4a19-bcef-4f1bf582983e"
       }

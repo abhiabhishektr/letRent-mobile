@@ -25,3 +25,23 @@ export interface ResendOtpResponse {
   message: string;
   resend_after: number;
 }
+
+export interface GoogleAuthResponse {
+  success?: boolean;
+  message?: string;
+  user?: {
+    id?: string | number;
+    user_id?: string | number;
+    mobile_number?: string;
+    name?: string;
+    email?: string;
+  };
+  tokens?: {
+    access?: string;
+    refresh?: string;
+  };
+  access?: string;
+  refresh?: string;
+  access_token?: string;
+  refresh_token?: string;
+}

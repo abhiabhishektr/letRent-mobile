@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ??
   Constants.expoConfig?.extra?.apiBaseUrl ??
-  "http://13.235.78.162";
+  "https://letrentapi.anwarmusthafa.com";
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

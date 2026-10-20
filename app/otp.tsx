@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../components/Button";
 import { colors, spacing } from "../theme";
@@ -128,12 +129,15 @@ export default function Otp() {
               />
             </Pressable>
 
-            <View style={styles.headerContainer}>
+            <Animated.View
+              entering={FadeInDown.duration(400)}
+              style={styles.headerContainer}
+            >
               <Text style={styles.title}>Verify your login</Text>
               <Text style={styles.subtitle}>
                 We&apos;ve sent a 6-digit code to {pendingPhone || "your mobile number"}.
               </Text>
-            </View>
+            </Animated.View>
 
             <Pressable style={styles.otpContainer} onPressIn={focusOtpInput}>
               {Array(OTP_LENGTH).fill(0).map((_, index) => {
@@ -144,8 +148,9 @@ export default function Otp() {
                 const isFilled = !!char;
 
                 return (
-                  <View
+                  <Animated.View
                     key={index}
+                    entering={FadeInDown.delay(80 + index * 60).springify()}
                     style={[
                       styles.otpCell,
                       isFilled && styles.otpCellFilled,
@@ -154,7 +159,7 @@ export default function Otp() {
                   >
                     <Text style={styles.otpText}>{char}</Text>
                     {isActive && !char && <View style={styles.cursor} />}
-                  </View>
+                  </Animated.View>
                 );
               })}
             </Pressable>
@@ -172,22 +177,26 @@ export default function Otp() {
               caretHidden={true}
             />
 
-            <Button
-              title={loading ? "Verifying OTP..." : "Verify OTP"}
-              onPress={submit}
-              loading={loading}
-              disabled={otp.length !== OTP_LENGTH || loading}
-              style={styles.primaryButton}
-            />
+            <Animated.View
+              entering={FadeInDown.delay(500).duration(350)}
+            >
+              <Button
+                title={loading ? "Verifying OTP..." : "Verify OTP"}
+                onPress={submit}
+                loading={loading}
+                disabled={otp.length !== OTP_LENGTH || loading}
+                style={styles.primaryButton}
+              />
 
-            <Button
-              title={resendLabel}
-              onPress={handleResend}
-              outline
-              loading={resendLoading}
-              disabled={resendLoading || (resendAfter !== null && resendAfter > 0)}
-              style={styles.resendButton}
-            />
+              <Button
+                title={resendLabel}
+                onPress={handleResend}
+                outline
+                loading={resendLoading}
+                disabled={resendLoading || (resendAfter !== null && resendAfter > 0)}
+                style={styles.resendButton}
+              />
+            </Animated.View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
