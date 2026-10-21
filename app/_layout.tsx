@@ -2,12 +2,15 @@ import { Stack, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../context/AuthContext";
-import { useAuth } from '../context/AuthContext';
-import { BottomNav } from '../components/BottomNav';
-import { ModeTransitionLoader } from '../components/ModeTransitionLoader';
+import { useAuth } from "../context/AuthContext";
+import { BottomNav } from "../components/BottomNav";
+import { ModeTransitionLoader } from "../components/ModeTransitionLoader";
+import { ThemeProvider, useTheme } from "../theme";
+import { StatusBar } from "expo-status-bar";
 
 function RootNavigator() {
   const { currentUser, isModeSwitching } = useAuth();
+  const { colorScheme } = useTheme();
   const pathname = usePathname();
   const active = pathname.startsWith('/tenant/payment')
     ? 'Payment'
@@ -25,6 +28,7 @@ function RootNavigator() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <View style={styles.root}>
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <View style={styles.stack}>
           <Stack
             screenOptions={{ headerShown: false, animation: "none" }}
@@ -48,9 +52,11 @@ function RootNavigator() {
 }
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 const styles = StyleSheet.create({ root: { flex: 1 }, stack: { flex: 1 } });

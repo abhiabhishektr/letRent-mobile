@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { AppText as Text } from "../components/AppText";
 import { Screen } from "../components/Screen";
 import { ModeSwitch } from "../components/ModeSwitch";
 import { rentRepository } from "../services/rentRepository";
-import { colors, spacing } from "../theme";
+import { useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 export default function Owner() {
   const [data, setData] = useState<any>();
+  const styles = useThemedStyles(createStyles);
   useEffect(() => {
     rentRepository.getOwnerDashboard().then(setData);
   }, []);
@@ -57,7 +60,8 @@ export default function Owner() {
     </Screen>
   );
 }
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: { padding: 0 },
   content: { flex: 1, padding: spacing.lg },
   top: {
@@ -67,21 +71,21 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 22, fontWeight: "800" },
   collection: {
-    backgroundColor: "#10a64d",
-    borderRadius: 12,
+    backgroundColor: colors.success,
+    borderRadius: radius.md,
     marginTop: spacing.lg,
     padding: spacing.lg,
     overflow: "hidden",
   },
-  small: { fontSize: 11, color: "#d9ffe7" },
-  total: { fontSize: 26, fontWeight: "800", color: "#fff", marginVertical: 4 },
-  change: { fontSize: 11, color: "#d9ffe7" },
+  small: { fontSize: 11, color: colors.successForeground },
+  total: { fontSize: 26, fontWeight: "800", color: colors.successForeground, marginVertical: 4 },
+  change: { fontSize: 11, color: colors.successForeground },
   chart: {
     position: "absolute",
     right: 18,
     bottom: 16,
     fontSize: 38,
-    color: "#b7f3cd",
+    color: colors.successForeground,
   },
   grid: {
     flexDirection: "row",
@@ -91,17 +95,17 @@ const styles = StyleSheet.create({
   },
   metric: {
     width: "48%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
     padding: 12,
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#edf0f5",
+    borderColor: colors.border,
   },
   metricIcon: { fontSize: 18, padding: 5, borderRadius: 7 },
-  label: { fontSize: 11, color: colors.secondaryText },
+  label: { fontSize: 11, color: colors.textSecondary },
   value: { fontSize: 17, fontWeight: "800", marginTop: 2 },
   recent: {
     fontSize: 14,
@@ -109,24 +113,25 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
   },
-  view: { color: colors.secondaryText },
+  view: { color: colors.textSecondary },
   list: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     padding: 12,
     borderBottomWidth: 1,
-    borderColor: "#edf0f5",
+    borderColor: colors.border,
     flexDirection: "row",
     justifyContent: "space-between",
   },
   name: { fontWeight: "700", fontSize: 13 },
-  meta: { color: colors.secondaryText, fontSize: 11, marginTop: 2 },
+  meta: { color: colors.textSecondary, fontSize: 11, marginTop: 2 },
   paid: {
-    color: "#149946",
+    color: colors.success,
     fontSize: 10,
     fontWeight: "800",
     alignSelf: "center",
-    backgroundColor: "#e6f9eb",
+    backgroundColor: colors.successBackground,
     padding: 4,
     borderRadius: 4,
   },
 });
+}

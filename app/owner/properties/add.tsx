@@ -5,14 +5,15 @@ import {
   Animated,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { AppText as Text } from "../../../components/AppText";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
 import { Screen } from "../../../components/Screen";
-import { colors, spacing, typography } from "../../../theme";
+import { useTheme, useThemedStyles } from "../../../theme";
+import type { AppTheme } from "../../../theme";
 import {
   createProperty,
   lookupPinCode,
@@ -59,6 +60,8 @@ export default function AddPropertyDetails() {
   const [locationLocked, setLocationLocked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -298,19 +301,20 @@ export default function AddPropertyDetails() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, typography, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
   back: { fontSize: 36, lineHeight: 35, marginTop: spacing.sm },
   title: { fontSize: 24, fontWeight: "800", marginBottom: spacing.md },
-  typeLabel: { ...typography.label, color: colors.secondaryText, marginBottom: spacing.xs },
+  typeLabel: { ...typography.label, color: colors.textSecondary, marginBottom: spacing.xs },
   typePill: {
-    backgroundColor: "#edf4ff",
-    borderRadius: 10,
+    backgroundColor: colors.secondary,
+    borderRadius: radius.sm,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: "#d4e3ff",
+    borderColor: colors.border,
   },
   typePillText: { fontSize: 15, fontWeight: "700", color: colors.primary },
   footer: { marginTop: spacing.lg },
@@ -320,22 +324,22 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
-  lookupText: { color: colors.secondaryText, fontSize: 12 },
+  lookupText: { color: colors.textSecondary, fontSize: 12 },
   successScreen: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(248, 250, 252, 0.98)",
+    backgroundColor: colors.background,
   },
   successCard: {
     width: "80%",
     backgroundColor: colors.surface,
-    borderRadius: 24,
+    borderRadius: radius.xl,
     paddingVertical: spacing.xxl,
     paddingHorizontal: spacing.lg,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#e7eef8",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.text,
     shadowOpacity: 0.08,
     shadowRadius: 18,
     elevation: 6,
@@ -344,7 +348,7 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: "#E8F8EE",
+    backgroundColor: colors.successBackground,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.md,
@@ -353,8 +357,9 @@ const styles = StyleSheet.create({
   successTitle: { fontSize: 24, fontWeight: "800", marginBottom: spacing.sm },
   successMessage: {
     fontSize: 15,
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     textAlign: "center",
     lineHeight: 22,
   },
 });
+}

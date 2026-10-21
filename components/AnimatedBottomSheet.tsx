@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-worklets";
@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { colors } from "../theme";
+import { useTheme } from "../theme";
 
 type Props = {
   children: React.ReactNode;
@@ -17,6 +17,45 @@ type Props = {
 };
 
 export function AnimatedBottomSheet({ children, onClose }: Props) {
+  const { colors, radius } = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          justifyContent: "flex-end",
+          backgroundColor: "transparent",
+        },
+        backdrop: {
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundColor: colors.overlay,
+        },
+        sheet: {
+          height: "92%",
+          overflow: "hidden",
+          borderTopLeftRadius: radius.xl,
+          borderTopRightRadius: radius.xl,
+          backgroundColor: colors.background,
+        },
+        dragHandleArea: {
+          height: 28,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.background,
+        },
+        dragHandle: {
+          width: 40,
+          height: 4,
+          borderRadius: radius.sm / 2,
+          backgroundColor: colors.border,
+        },
+      }),
+    [colors, radius],
+  );
   const initialHeight = Dimensions.get("window").height;
   const windowHeight = useSharedValue(initialHeight);
   const sheetY = useSharedValue(initialHeight);
@@ -81,38 +120,3 @@ export function AnimatedBottomSheet({ children, onClose }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "transparent",
-  },
-  backdrop: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: colors.overlay,
-  },
-  sheet: {
-    height: "92%",
-    overflow: "hidden",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    backgroundColor: colors.background,
-  },
-  dragHandleArea: {
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-  dragHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.border,
-  },
-});

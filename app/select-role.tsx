@@ -3,20 +3,23 @@ import {
   Alert,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { AppText as Text } from "../components/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 
 import { useAuth } from "../context/AuthContext";
-import { colors, spacing } from "../theme";
+import { useTheme, useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 import { AppMode } from "../types/user";
 
 export default function SelectRole() {
   const { mode, switchMode, isModeSwitching } = useAuth();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
 
   const chooseMode = async (selectedMode: AppMode) => {
     if (isModeSwitching) return;
@@ -82,7 +85,7 @@ export default function SelectRole() {
             ]}
           >
             <View style={[styles.iconWrap, styles.ownerIconWrap]}>
-              <AntDesign name="home" size={23} color={styles.ownerIcon.color as string} />
+              <AntDesign name="home" size={23} color={colors.success} />
             </View>
             <View style={styles.optionCopy}>
               <Text style={styles.optionTitle}>I'm an owner</Text>
@@ -102,10 +105,11 @@ export default function SelectRole() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.background || "#FFFFFF",
+    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
@@ -128,7 +132,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   eyebrowText: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   subtitle: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 16,
     lineHeight: 23,
   },
@@ -153,13 +157,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: "#E7EAF0",
+    borderColor: colors.border,
   },
   optionPressed: {
-    backgroundColor: "#F7F8FA",
+    backgroundColor: colors.surfaceSecondary,
     borderColor: colors.primary,
   },
   optionDisabled: {
@@ -173,13 +177,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tenantIconWrap: {
-    backgroundColor: "#EAF1FF",
+    backgroundColor: colors.secondary,
   },
   ownerIconWrap: {
-    backgroundColor: "#EAF7EF",
-  },
-  ownerIcon: {
-    color: "#24834D",
+    backgroundColor: colors.surfaceSecondary,
   },
   optionCopy: {
     flex: 1,
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   optionSubtitle: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -205,11 +206,12 @@ const styles = StyleSheet.create({
   bottomLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#E7EAF0",
+    backgroundColor: colors.border,
   },
   bottomText: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 12,
     marginHorizontal: spacing.md,
   },
 });
+}

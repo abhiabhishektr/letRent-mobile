@@ -3,7 +3,6 @@ import {
   Alert,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
   Platform,
@@ -11,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Image,
 } from "react-native";
+import { AppText as Text } from "../components/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
@@ -24,7 +24,8 @@ import * as WebBrowser from "expo-web-browser";
 
 import { AnimatedBottomSheet } from "../components/AnimatedBottomSheet";
 import { Button } from "../components/Button";
-import { colors, spacing } from "../theme";
+import { useTheme, useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -36,6 +37,8 @@ export default function Login() {
 
   const { beginLogin, loginWithGoogle } = useAuth();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const extra = Constants.expoConfig?.extra;
   const googleWebClientId =
     typeof extra?.googleWebClientId === "string" ? extra.googleWebClientId : "";
@@ -199,7 +202,7 @@ export default function Login() {
                   style={styles.input}
                   maxLength={10}
                   placeholder="00000 00000"
-                  placeholderTextColor={colors.secondaryText}
+                  placeholderTextColor={colors.placeholder}
                   selectionColor={colors.primary}
                   returnKeyType="done"
                 />
@@ -271,10 +274,11 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.background || "#FFFFFF",
+    backgroundColor: colors.background,
   },
 
   keyboardAvoidingView: { flex: 1 },
@@ -295,8 +299,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F4F4F6",
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.xl,
@@ -305,7 +309,7 @@ const styles = StyleSheet.create({
 
   backButtonPressed: {
     opacity: 0.6,
-    backgroundColor: "#EAEAEC",
+    backgroundColor: colors.border,
   },
 
   headerContainer: {
@@ -322,7 +326,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 15,
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontWeight: "400",
     lineHeight: 22,
   },
@@ -332,8 +336,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.md,
-    backgroundColor: "#F9F9FA",
-    borderRadius: 16,
+    backgroundColor: colors.inputBackground,
+    borderRadius: radius.lg,
     borderWidth: 1.5,
     borderColor: "transparent",
     marginBottom: spacing.lg,
@@ -345,7 +349,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     paddingRight: spacing.sm,
     borderRightWidth: 1,
-    borderRightColor: "#EAEAEC",
+    borderRightColor: colors.border,
   },
 
   input: {
@@ -388,11 +392,11 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#EAEAEC",
+    backgroundColor: colors.border,
   },
 
   orText: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 13,
     fontWeight: "600",
     marginHorizontal: spacing.md,
@@ -400,11 +404,11 @@ const styles = StyleSheet.create({
   },
 
   social: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#EAEAEC",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
     borderWidth: 1,
     marginBottom: spacing.md,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     height: 56,
   },
 
@@ -416,7 +420,7 @@ const styles = StyleSheet.create({
   terms: {
     fontSize: 13,
     textAlign: "center",
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     lineHeight: 20,
     marginTop: spacing.lg,
   },
@@ -426,3 +430,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+}

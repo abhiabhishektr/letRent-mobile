@@ -1,8 +1,18 @@
-import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, Animated, Image, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, Animated, Image, StyleSheet, View } from 'react-native';
+import { AppText } from './AppText';
+import { useTheme } from '../theme';
 
 export function ModeTransitionLoader() {
+  const { colors, typography, spacing } = useTheme();
+  const styles = useMemo(() => StyleSheet.create({
+    overlay: { ...StyleSheet.absoluteFill, zIndex: 100, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' },
+    card: { alignItems: 'center' },
+    logo: { width: 128, height: 128 },
+    brand: { ...typography.subheading, fontSize: 24, fontWeight: '800', color: colors.text, marginTop: spacing.xs },
+    message: { ...typography.caption, color: colors.textSecondary, marginTop: 5 },
+    spinner: { marginTop: spacing.lg },
+  }), [colors, spacing, typography]);
   const pulse = useRef(new Animated.Value(0.96)).current;
   useEffect(() => {
     const animation = Animated.loop(Animated.sequence([Animated.timing(pulse, { toValue: 1.04, duration: 700, useNativeDriver: true }), Animated.timing(pulse, { toValue: 0.96, duration: 700, useNativeDriver: true })]));
@@ -10,7 +20,6 @@ export function ModeTransitionLoader() {
     return () => animation.stop();
   }, [pulse]);
   return <View style={styles.overlay} accessibilityRole="progressbar" accessibilityLabel="Switching LetRent mode">
-    <Animated.View style={[styles.card, { transform: [{ scale: pulse }] }]}><Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /><Text style={styles.brand}>LetRent</Text><Text style={styles.message}>Updating your workspace</Text><ActivityIndicator color={colors.primary} style={styles.spinner} /></Animated.View>
+    <Animated.View style={[styles.card, { transform: [{ scale: pulse }] }]}><Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /><AppText style={styles.brand}>LetRent</AppText><AppText style={styles.message}>Updating your workspace</AppText><ActivityIndicator color={colors.primary} style={styles.spinner} /></Animated.View>
   </View>;
 }
-const styles = StyleSheet.create({ overlay:{...StyleSheet.absoluteFill,zIndex:100,backgroundColor:'rgba(248,250,252,0.96)',alignItems:'center',justifyContent:'center'},card:{alignItems:'center'},logo:{width:128,height:128},brand:{fontSize:24,fontWeight:'800',color:colors.text,marginTop:4},message:{fontSize:13,color:colors.secondaryText,marginTop:5},spinner:{marginTop:18} });

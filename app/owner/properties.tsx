@@ -5,13 +5,14 @@ import {
   Modal,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { AppText as Text } from '../../components/AppText';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
-import { colors, spacing } from '../../theme';
+import { useThemedStyles } from '../../theme';
+import type { AppTheme } from '../../theme';
 import { getProperties, PropertyResponse } from '../../services/propertyApi';
 
 const PROPERTY_TYPE_OPTIONS = [
@@ -26,6 +27,7 @@ export default function Properties() {
   const [properties, setProperties] = useState<PropertyResponse[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
   const sheetTranslate = useRef(new Animated.Value(260)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
@@ -138,30 +140,32 @@ export default function Properties() {
     </Modal>
   </AppShell>;
 }
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   content:{padding:spacing.lg,paddingBottom:spacing.xxl},
   headerRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
   back:{fontSize:36,lineHeight:35,flex:1},
   title:{fontSize:24,fontWeight:'800',marginTop:spacing.sm,flex: 1},
-  addButton:{width:34,height:34,borderRadius:17,backgroundColor:'#eef5ff',alignItems:'center',justifyContent:'center',marginTop:spacing.sm},
+  addButton:{width:34,height:34,borderRadius:radius.pill,backgroundColor:colors.secondary,alignItems:'center',justifyContent:'center',marginTop:spacing.sm},
   addIcon:{fontSize:24,color:colors.primary,fontWeight:'700'},
-  sub:{color:colors.secondaryText,fontSize:13,marginTop:4,marginBottom:spacing.lg},
-  card:{backgroundColor:'#fff',borderWidth:1,borderColor:'#edf0f5',borderRadius:12,padding:spacing.md,marginBottom:spacing.sm,shadowColor:'#49617D',shadowOpacity:0.06,shadowRadius:8,elevation:2},
+  sub:{color:colors.textSecondary,fontSize:13,marginTop:4,marginBottom:spacing.lg},
+  card:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.border,borderRadius:radius.md,padding:spacing.md,marginBottom:spacing.sm,shadowColor:colors.text,shadowOpacity:0.06,shadowRadius:8,elevation:2},
   cardBody:{flexDirection:'row',alignItems:'center',gap:12},
-  icon:{backgroundColor:'#eaf9ef',padding:12,borderRadius:10},
+  icon:{backgroundColor:colors.successBackground,padding:12,borderRadius:radius.sm},
   cardContent:{flex:1},
   name:{fontSize:15,fontWeight:'800'},
-  meta:{fontSize:12,color:colors.secondaryText,marginTop:4},
-  arrow:{fontSize:24,color:colors.secondaryText},
+  meta:{fontSize:12,color:colors.textSecondary,marginTop:4},
+  arrow:{fontSize:24,color:colors.textSecondary},
   empty:{alignItems:'center',paddingVertical:spacing.xxl},
   emptyTitle:{fontSize:16,fontWeight:'700',color:colors.text},
-  emptyCopy:{fontSize:13,color:colors.secondaryText,marginTop:4},
+  emptyCopy:{fontSize:13,color:colors.textSecondary,marginTop:4},
   modalBackdrop:{flex:1,justifyContent:'flex-end'},
-  backdrop:{...StyleSheet.absoluteFill,backgroundColor:'rgba(15, 23, 42, 0.35)'},
-  sheet:{backgroundColor:'#fff',borderTopLeftRadius:22,borderTopRightRadius:22,paddingHorizontal:spacing.lg,paddingTop:spacing.sm,paddingBottom:spacing.xl,marginTop:'auto',shadowColor:'#000',shadowOpacity:0.08,shadowRadius:14,elevation:10},
-  sheetHandle:{width:44,height:4,borderRadius:4,backgroundColor:'#dfe6f1',alignSelf:'center',marginBottom:spacing.md},
+  backdrop:{...StyleSheet.absoluteFill,backgroundColor:colors.overlay},
+  sheet:{backgroundColor:colors.surface,borderTopLeftRadius:radius.xl,borderTopRightRadius:radius.xl,paddingHorizontal:spacing.lg,paddingTop:spacing.sm,paddingBottom:spacing.xl,marginTop:'auto',shadowColor:colors.text,shadowOpacity:0.08,shadowRadius:14,elevation:10},
+  sheetHandle:{width:44,height:4,borderRadius:radius.pill,backgroundColor:colors.border,alignSelf:'center',marginBottom:spacing.md},
   sheetTitle:{fontSize:22,fontWeight:'800',marginBottom:spacing.md},
-  optionRow:{flexDirection:'row',alignItems:'center',paddingVertical:spacing.md,borderBottomWidth:1,borderBottomColor:'#edf0f5'},
+  optionRow:{flexDirection:'row',alignItems:'center',paddingVertical:spacing.md,borderBottomWidth:1,borderBottomColor:colors.border},
   optionIcon:{fontSize:24,marginRight:spacing.md},
   optionLabel:{fontSize:17,fontWeight:'600',color:colors.text},
 });
+}

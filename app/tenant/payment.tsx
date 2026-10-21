@@ -1,11 +1,14 @@
 import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
+import { AppText as Text } from "../../components/AppText";
 import { useRouter } from "expo-router";
 import { AppShell } from "../../components/AppShell";
 import { Button } from "../../components/Button";
-import { colors, spacing } from "../../theme";
+import { useThemedStyles } from "../../theme";
+import type { AppTheme } from "../../theme";
 export default function Payment() {
   const router = useRouter();
+  const s = useThemedStyles(createStyles);
   return (
     <AppShell active="Payment" style={s.content}>
       <Text onPress={() => router.back()} style={s.back}>
@@ -39,17 +42,18 @@ export default function Payment() {
     </AppShell>
   );
 }
-const s = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   content: { padding: spacing.lg },
   back: { fontSize: 36, lineHeight: 35 },
   title: { fontSize: 24, fontWeight: "800", marginTop: spacing.sm },
   card: {
-    backgroundColor: "#f1f5ff",
+    backgroundColor: colors.secondary,
     padding: spacing.lg,
-    borderRadius: 14,
+    borderRadius: radius.lg,
     marginTop: spacing.xl,
   },
-  label: { fontSize: 13, color: colors.secondaryText },
+  label: { fontSize: 13, color: colors.textSecondary },
   amount: { fontSize: 30, fontWeight: "800", marginVertical: spacing.sm },
   section: {
     fontSize: 15,
@@ -58,10 +62,10 @@ const s = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   method: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#e9edf4",
-    borderRadius: 10,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
     padding: spacing.md,
     marginBottom: spacing.sm,
     flexDirection: "row",
@@ -72,3 +76,4 @@ const s = StyleSheet.create({
   methodText: { flex: 1, fontWeight: "600" },
   button: { marginTop: "auto" },
 });
+}

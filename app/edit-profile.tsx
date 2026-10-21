@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { AppText as Text } from '../components/AppText';
 import { AppShell } from '../components/AppShell';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuth } from '../context/AuthContext';
-import { colors, spacing } from '../theme';
+import { useThemedStyles } from '../theme';
+import type { AppTheme } from '../theme';
 
 /** Local-only profile form. It can be replaced with a profile API call later. */
 export default function EditProfile() {
   const { currentUser, updateProfile } = useAuth();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
   const [name, setName] = useState(currentUser?.name ?? 'Rahul');
   const [phone, setPhone] = useState(currentUser?.phone ?? '98765 43210');
   const [email, setEmail] = useState('rahul@example.com');
@@ -35,4 +38,15 @@ export default function EditProfile() {
     <Button title="Save changes" onPress={save} style={styles.save} />
   </AppShell>;
 }
-const styles = StyleSheet.create({ content:{padding:spacing.lg},back:{fontSize:36,lineHeight:35,color:colors.text},title:{fontSize:24,fontWeight:'800',color:colors.text,marginTop:spacing.sm},subtitle:{fontSize:13,color:colors.secondaryText,marginTop:4},avatar:{width:64,height:64,borderRadius:32,backgroundColor:'#e8efff',alignItems:'center',justifyContent:'center',marginTop:spacing.xl},avatarText:{fontSize:26,fontWeight:'800',color:colors.primary},form:{marginTop:spacing.xl},save:{marginTop:'auto'} });
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
+    content: { padding: spacing.lg },
+    back: { fontSize: 36, lineHeight: 35, color: colors.text },
+    title: { fontSize: 24, fontWeight: '800', color: colors.text, marginTop: spacing.sm },
+    subtitle: { fontSize: 13, color: colors.textSecondary, marginTop: spacing.xs },
+    avatar: { width: 64, height: 64, borderRadius: radius.pill, backgroundColor: colors.secondary, alignItems: 'center', justifyContent: 'center', marginTop: spacing.xl },
+    avatarText: { fontSize: 26, fontWeight: '800', color: colors.primary },
+    form: { marginTop: spacing.xl },
+    save: { marginTop: 'auto' },
+  });
+}

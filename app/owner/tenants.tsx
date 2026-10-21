@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { AppText as Text } from '../../components/AppText';
 import { useRouter } from 'expo-router';
 import { AppShell } from '../../components/AppShell';
 import { FilterGroup, SearchFilterBar } from '../../components/SearchFilterBar';
 import { OwnerTenant, rentRepository, TenantQuery } from '../../services/rentRepository';
-import { colors, spacing } from '../../theme';
+import { useThemedStyles } from '../../theme';
+import type { AppTheme } from '../../theme';
 
 const FILTERS: FilterGroup[] = [
   { key: 'status', label: 'Payment status', options: [{ label: 'Paid', value: 'Paid' }, { label: 'Due', value: 'Due' }, { label: 'Late fee', value: 'Late Fee' }] },
@@ -16,6 +18,7 @@ export default function Tenants() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [tenants, setTenants] = useState<OwnerTenant[]>([]);
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
   const query = useMemo<TenantQuery>(() => ({ search, status: filters.status as TenantQuery['status'], date: filters.date, property: filters.property }), [search, filters]);
   useEffect(() => { rentRepository.getOwnerTenants(query).then(setTenants); }, [query]);
   return <AppShell active="Tenants" scroll style={styles.content}>
@@ -29,4 +32,23 @@ export default function Tenants() {
     {!tenants.length ? <View style={styles.empty}><Text style={styles.emptyTitle}>No tenants found</Text><Text style={styles.emptyCopy}>Change the search or filters and try again.</Text></View> : null}
   </AppShell>;
 }
-const styles = StyleSheet.create({ content:{padding:spacing.lg,paddingBottom:spacing.xxl},back:{fontSize:36,lineHeight:35},title:{fontSize:24,fontWeight:'800',marginTop:spacing.sm},sub:{fontSize:13,color:colors.secondaryText,marginTop:4,marginBottom:spacing.lg},row:{flexDirection:'row',alignItems:'center',gap:10,borderBottomWidth:1,borderColor:'#edf0f5',paddingVertical:spacing.md},avatar:{width:38,height:38,borderRadius:19,backgroundColor:'#e9f1ff',alignItems:'center',justifyContent:'center'},info:{flex:1},name:{fontSize:14,fontWeight:'800'},meta:{fontSize:11,color:colors.secondaryText,marginTop:3},amount:{fontSize:11,color:colors.text,marginTop:3,fontWeight:'600'},paid:{color:'#149946',fontWeight:'800',fontSize:11},due:{color:'#e05a30',fontWeight:'800',fontSize:11},late:{color:'#a855f7',fontWeight:'800',fontSize:11},empty:{alignItems:'center',paddingVertical:spacing.xxl},emptyTitle:{fontSize:16,fontWeight:'700',color:colors.text},emptyCopy:{fontSize:13,color:colors.secondaryText,marginTop:4} });
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
+    content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    back: { fontSize: 36, lineHeight: 35, color: colors.text },
+    title: { fontSize: 24, fontWeight: '800', color: colors.text, marginTop: spacing.sm },
+    sub: { fontSize: 13, color: colors.textSecondary, marginTop: spacing.xs, marginBottom: spacing.lg },
+    row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderBottomWidth: 1, borderColor: colors.border, paddingVertical: spacing.md },
+    avatar: { width: 38, height: 38, borderRadius: radius.pill, backgroundColor: colors.secondary, alignItems: 'center', justifyContent: 'center' },
+    info: { flex: 1 },
+    name: { fontSize: 14, fontWeight: '800', color: colors.text },
+    meta: { fontSize: 11, color: colors.textSecondary, marginTop: spacing.xs },
+    amount: { fontSize: 11, color: colors.text, marginTop: spacing.xs, fontWeight: '600' },
+    paid: { color: colors.success, fontWeight: '800', fontSize: 11 },
+    due: { color: colors.warning, fontWeight: '800', fontSize: 11 },
+    late: { color: colors.info, fontWeight: '800', fontSize: 11 },
+    empty: { alignItems: 'center', paddingVertical: spacing.xxl },
+    emptyTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+    emptyCopy: { fontSize: 13, color: colors.textSecondary, marginTop: spacing.xs },
+  });
+}

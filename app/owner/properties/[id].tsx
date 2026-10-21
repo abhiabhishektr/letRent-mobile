@@ -4,12 +4,13 @@ import {
   Alert,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { AppText as Text } from "../../../components/AppText";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "../../../components/Screen";
-import { colors, spacing } from "../../../theme";
+import { useTheme, useThemedStyles } from "../../../theme";
+import type { AppTheme } from "../../../theme";
 import {
   deleteProperty,
   getProperty,
@@ -28,6 +29,8 @@ export default function PropertyDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const propertyId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const [property, setProperty] = useState<PropertyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -155,6 +158,7 @@ export default function PropertyDetailScreen() {
 }
 
 function InfoCard({ label, value }: { label: string; value: string }) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.infoCard}>
       <Text style={styles.infoLabel}>{label}</Text>
@@ -163,7 +167,8 @@ function InfoCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
   loadingScreen: { justifyContent: "center", alignItems: "center" },
   emptyScreen: { justifyContent: "center", alignItems: "center" },
@@ -178,8 +183,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 34,
     height: 34,
-    borderRadius: 17,
-    backgroundColor: "#f4f7fb",
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -189,24 +194,24 @@ const styles = StyleSheet.create({
   gearButton: {
     width: 34,
     height: 34,
-    borderRadius: 17,
-    backgroundColor: "#f4f7fb",
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 3,
   },
-  gearText: { fontSize: 16, color: colors.secondaryText },
+  gearText: { fontSize: 16, color: colors.textSecondary },
   menuBox: {
     position: "absolute",
     right: 0,
     top: 40,
     width: 128,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#edf0f5",
+    borderColor: colors.border,
     paddingVertical: 6,
-    shadowColor: "#000",
+    shadowColor: colors.text,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 6,
@@ -214,30 +219,30 @@ const styles = StyleSheet.create({
   },
   menuItem: { paddingHorizontal: 12, paddingVertical: 10 },
   menuItemText: { fontSize: 14, color: colors.text, fontWeight: "600" },
-  menuItemDanger: { paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: "#edf0f5" },
+  menuItemDanger: { paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.border },
   menuItemDangerText: { fontSize: 14, color: colors.error, fontWeight: "600" },
   heroCard: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#edf0f5",
-    borderRadius: 18,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     marginBottom: spacing.lg,
-    shadowColor: "#49617D",
+    shadowColor: colors.text,
     shadowOpacity: 0.06,
     shadowRadius: 10,
     elevation: 2,
   },
-  heroLabel: { fontSize: 12, color: colors.secondaryText, textTransform: "uppercase", letterSpacing: 0.4 },
+  heroLabel: { fontSize: 12, color: colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.4 },
   typeBadge: {
     marginTop: spacing.sm,
     alignSelf: "flex-start",
-    backgroundColor: "#edf4ff",
-    borderRadius: 12,
+    backgroundColor: colors.secondary,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderColor: "#d4e3ff",
+    borderColor: colors.border,
   },
   typeText: { color: colors.primary, fontSize: 14, fontWeight: "700" },
   address: { marginTop: spacing.md, fontSize: 16, fontWeight: "600", color: colors.text, lineHeight: 24 },
@@ -245,12 +250,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   infoCard: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#edf0f5",
+    borderColor: colors.border,
     padding: spacing.md,
   },
-  infoLabel: { fontSize: 12, color: colors.secondaryText, marginBottom: spacing.xs },
+  infoLabel: { fontSize: 12, color: colors.textSecondary, marginBottom: spacing.xs },
   infoValue: { fontSize: 16, fontWeight: "700", color: colors.text },
 });
+}

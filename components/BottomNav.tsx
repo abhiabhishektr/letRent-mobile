@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "expo-router";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../theme";
+import { AppText } from "./AppText";
+import { useTheme } from "../theme";
 const tenant = [
   ["⌂", "Home", "/tenant"],
   ["▣", "Payment", "/tenant/payment"],
@@ -24,8 +25,36 @@ export function BottomNav({
 }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors, spacing, typography } = useTheme();
   const items = mode === "tenant" ? tenant : owner;
   const animations = useRef(items.map(() => new Animated.Value(0))).current;
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        nav: {
+          flexDirection: "row",
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          borderColor: colors.border,
+          paddingVertical: spacing.sm,
+        },
+        item: {
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 48,
+          gap: spacing.xs,
+        },
+        icon: { fontSize: 19, color: colors.textSecondary },
+        label: {
+          ...typography.caption,
+          fontSize: 10,
+          color: colors.textSecondary,
+        },
+        selected: { color: colors.primary, fontWeight: "800" },
+      }),
+    [colors, spacing, typography],
+  );
 
   useEffect(() => {
     Animated.parallel(
@@ -45,6 +74,9 @@ export function BottomNav({
       {items.map(([icon, label, path], index) => (
         <Pressable
           key={label}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityState={{ selected: active === label }}
           onPress={() => {
             if (active !== label) router.replace(path as never);
           }}
@@ -60,28 +92,15 @@ export function BottomNav({
               transform: [{ scale: animations[index].interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.08] }) }],
             }}
           >
-            <Text style={[styles.icon, active === label && styles.selected]}>
+            <AppText style={[styles.icon, active === label && styles.selected]}>
               {icon}
-            </Text>
-            <Text style={[styles.label, active === label && styles.selected]}>
+            </AppText>
+            <AppText style={[styles.label, active === label && styles.selected]}>
               {label}
-            </Text>
+            </AppText>
           </Animated.View>
         </Pressable>
       ))}
     </View>
   );
 }
-const styles = StyleSheet.create({
-  nav: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderColor: "#edf0f5",
-    paddingVertical: 8,
-  },
-  item: { flex: 1, alignItems: "center", gap: 3 },
-  icon: { fontSize: 19, color: "#8a96a8" },
-  label: { fontSize: 10, color: "#8a96a8" },
-  selected: { color: colors.primary, fontWeight: "800" },
-});

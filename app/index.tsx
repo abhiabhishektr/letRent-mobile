@@ -1,11 +1,13 @@
 import React from "react";
 import { Redirect, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View, Dimensions } from "react-native";
+import { Pressable, StyleSheet, View, Dimensions } from "react-native";
 import LottieView from "lottie-react-native";
 
+import { AppText as Text } from "../components/AppText";
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
-import { colors, spacing } from "../theme";
+import { useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
 const { width } = Dimensions.get("window");
@@ -13,6 +15,7 @@ const { width } = Dimensions.get("window");
 export default function Welcome() {
   const { currentUser, isLoading } = useAuth();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
 
   if (isLoading) return null;
 
@@ -72,13 +75,14 @@ export default function Welcome() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: {
     flex: 1,
     justifyContent: "space-between",
     paddingVertical: spacing.xxl,
     paddingHorizontal: spacing.lg,
-    backgroundColor: colors.background || "#ffffff",
+    backgroundColor: colors.background,
   },
   header: {
     paddingTop: spacing.xl,
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 22,
     fontWeight: "500",
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     letterSpacing: 0.5,
   },
   brand: {
@@ -116,8 +120,8 @@ const styles = StyleSheet.create({
   illustrationBackground: {
     width: width * 0.8,
     height: width * 0.8,
-    backgroundColor: "#F4F7FF", // Softer, premium background tint
-    borderRadius: width * 0.4, // Perfect circle
+    backgroundColor: colors.secondary,
+    borderRadius: width * 0.4,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: colors.primary,
@@ -153,9 +157,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   skip: {
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: "600",
     letterSpacing: 0.3,
   },
 });
+}

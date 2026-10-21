@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Alert,
   StyleSheet,
-  Text,
   View,
   TextInput,
   Platform,
@@ -10,13 +9,15 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
+import { AppText as Text } from "../components/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../components/Button";
-import { colors, spacing } from "../theme";
+import { useTheme, useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
 const OTP_LENGTH = 6;
@@ -24,6 +25,8 @@ const OTP_LENGTH = 6;
 export default function Otp() {
   const { verifyOtp, resendOtp, pendingPhone } = useAuth();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -204,10 +207,11 @@ export default function Otp() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.background || "#FFFFFF",
+    backgroundColor: colors.background,
   },
   keyboardView: {
     flex: 1,
@@ -224,8 +228,8 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F4F4F6",
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.xl,
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
   },
   backButtonPressed: {
     opacity: 0.6,
-    backgroundColor: "#EAEAEC",
+    backgroundColor: colors.border,
   },
   headerContainer: {
     marginBottom: spacing.xl,
@@ -247,7 +251,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 15,
-    color: colors.secondaryText,
+    color: colors.textSecondary,
     fontWeight: "400",
     lineHeight: 22,
   },
@@ -260,20 +264,20 @@ const styles = StyleSheet.create({
   otpCell: {
     width: 50,
     height: 60,
-    borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
     borderWidth: 1.5,
-    borderColor: "#EAEAEC",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   otpCellFilled: {
-    borderColor: "#D1D1D6",
-    backgroundColor: "#F9F9FA",
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSecondary,
   },
   otpCellActive: {
     borderColor: colors.primary,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     ...Platform.select({
       ios: {
         shadowColor: colors.primary,
@@ -297,7 +301,7 @@ const styles = StyleSheet.create({
     width: 2,
     height: 24,
     backgroundColor: colors.primary,
-    borderRadius: 1,
+    borderRadius: radius.sm / 2,
   },
   hiddenInput: {
     position: "absolute",
@@ -306,7 +310,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   primaryButton: {
-    borderRadius: 16,
+    borderRadius: radius.lg,
     height: 56,
     marginBottom: spacing.md,
     ...Platform.select({
@@ -322,8 +326,9 @@ const styles = StyleSheet.create({
     }),
   },
   resendButton: {
-    borderRadius: 16,
+    borderRadius: radius.lg,
     height: 52,
     marginTop: spacing.sm,
   },
 });
+}

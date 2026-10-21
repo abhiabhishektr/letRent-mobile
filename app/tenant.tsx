@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
+import { AppText as Text } from "../components/AppText";
 import { useRouter } from "expo-router";
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
 import { ModeSwitch } from "../components/ModeSwitch";
 import { rentRepository } from "../services/rentRepository";
-import { colors, spacing } from "../theme";
+import { useThemedStyles } from "../theme";
+import type { AppTheme } from "../theme";
 export default function Tenant() {
   const [data, setData] = useState<any>();
   const router = useRouter();
+  const styles = useThemedStyles(createStyles);
   useEffect(() => {
     rentRepository.getTenantDashboard().then(setData);
   }, []);
@@ -70,7 +73,8 @@ export default function Tenant() {
     </Screen>
   );
 }
-const styles = StyleSheet.create({
+function createStyles({ colors, spacing, radius }: AppTheme) {
+  return StyleSheet.create({
   screen: { padding: 0 },
   content: { flex: 1, padding: spacing.lg },
   top: {
@@ -79,13 +83,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   hello: { fontSize: 21, fontWeight: "800", color: colors.text },
-  unit: { fontSize: 12, color: colors.secondaryText, marginTop: 3 },
+  unit: { fontSize: 12, color: colors.textSecondary, marginTop: 3 },
   rent: {
-    backgroundColor: "#fff3f1",
-    borderRadius: 12,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
     padding: spacing.lg,
     marginTop: spacing.lg,
-    shadowColor: "#789",
+    shadowColor: colors.text,
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 2,
@@ -93,14 +97,14 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between" },
   month: { fontWeight: "800", fontSize: 15 },
   due: {
-    backgroundColor: "#fff",
-    color: "#ed402f",
+    backgroundColor: colors.surface,
+    color: colors.error,
     fontSize: 11,
     fontWeight: "800",
     padding: 4,
-    borderRadius: 4,
+    borderRadius: radius.sm / 2,
   },
-  date: { color: colors.secondaryText, fontSize: 12, marginTop: 4 },
+  date: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   amount: { fontSize: 24, fontWeight: "800", marginVertical: spacing.md },
   pay: { minHeight: 43 },
   section: {
@@ -111,18 +115,18 @@ const styles = StyleSheet.create({
   },
   overview: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: "#e9edf4",
+    borderColor: colors.border,
   },
   metric: {
     flex: 1,
     padding: 10,
     borderRightWidth: 1,
-    borderRightColor: "#e9edf4",
+    borderRightColor: colors.border,
   },
-  metricLabel: { fontSize: 10, color: colors.secondaryText },
+  metricLabel: { fontSize: 10, color: colors.textSecondary },
   metricValue: { fontWeight: "800", fontSize: 14, marginTop: 4 },
   actions: { flexDirection: "row", justifyContent: "space-between" },
   action: { alignItems: "center", width: "24%" },
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.primary,
     borderWidth: 1,
-    borderColor: "#e7ecf4",
+    borderColor: colors.border,
     padding: 9,
     borderRadius: 10,
   },
@@ -141,3 +145,4 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
 });
+}

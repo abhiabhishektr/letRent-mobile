@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   ViewStyle,
   View,
 } from "react-native";
 import type { ReactNode } from "react";
-import { colors, spacing, typography } from "../theme";
+import { AppText } from "./AppText";
+import { useTheme } from "../theme";
 type Props = {
   title: string;
   icon?: ReactNode;
@@ -30,9 +30,40 @@ export function Button({
   style,
 }: Props) {
   const inactive = disabled || loading;
+  const { colors, spacing, typography, radius } = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        base: {
+          minHeight: 48,
+          borderRadius: radius.md,
+          backgroundColor: colors.primary,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: spacing.lg,
+        },
+        danger: { backgroundColor: colors.error },
+        outline: {
+          backgroundColor: "transparent",
+          borderWidth: 1,
+          borderColor: colors.primary,
+        },
+        disabled: { backgroundColor: colors.surfaceSecondary, opacity: 0.7 },
+        pressed: { opacity: 0.75 },
+        text: { color: colors.primaryForeground },
+        disabledText: { color: colors.textDisabled },
+        outlineText: { color: colors.primary },
+        content: { flexDirection: "row", alignItems: "center" },
+        titleWithIcon: { marginLeft: spacing.sm },
+      }),
+    [colors, radius, spacing],
+  );
+
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: inactive, busy: Boolean(loading) }}
       disabled={inactive}
       onPress={onPress}
       style={({ pressed }) => [
@@ -45,43 +76,24 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={outline ? colors.primary : "#fff"} />
+        <ActivityIndicator
+          color={colors.primary}
+        />
       ) : (
         <View style={styles.content}>
           {icon}
-          <Text
+          <AppText
             style={[
               typography.button,
               outline ? styles.outlineText : styles.text,
+              inactive && !loading && styles.disabledText,
               !!icon && styles.titleWithIcon,
             ]}
           >
             {title}
-          </Text>
+          </AppText>
         </View>
       )}
     </Pressable>
   );
 }
-const styles = StyleSheet.create({
-  base: {
-    minHeight: 48,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: spacing.lg,
-  },
-  danger: { backgroundColor: colors.error },
-  outline: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  disabled: { backgroundColor: colors.disabled },
-  pressed: { opacity: 0.75 },
-  text: { color: "#fff" },
-  outlineText: { color: colors.primary },
-  content: { flexDirection: "row", alignItems: "center" },
-  titleWithIcon: { marginLeft: spacing.sm },
-});
