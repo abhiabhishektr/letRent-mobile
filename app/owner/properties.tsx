@@ -117,18 +117,44 @@ export default function Properties() {
       </Pressable>
       <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetTranslate }] }]}>
         <View style={styles.sheetHandle} />
-        <Text style={styles.sheetTitle}>Add Property</Text>
-        {PROPERTY_TYPE_OPTIONS.map((option) => (
+        <View style={styles.sheetHeader}>
+          <View style={styles.sheetHeaderText}>
+            <Text style={styles.sheetTitle}>Add Property</Text>
+            <Text style={styles.sheetSubtitle}>Choose how you want to list your property</Text>
+          </View>
           <Pressable
-            key={option.value}
-            style={styles.optionRow}
-            onPress={() => handleSelectType(option.value)}
+            style={styles.closeButton}
+            onPress={() => setShowAddModal(false)}
             accessibilityRole="button"
+            accessibilityLabel="Close"
           >
-            <Text style={styles.optionIcon}>{option.icon}</Text>
-            <Text style={styles.optionLabel}>{option.label}</Text>
+            <Text style={styles.closeIcon}>✕</Text>
           </Pressable>
-        ))}
+        </View>
+        <View style={styles.grid}>
+          {PROPERTY_TYPE_OPTIONS.map((option, index) => (
+            <Pressable
+              key={option.value}
+              style={({ pressed }) => [
+                styles.typeCard,
+                index === PROPERTY_TYPE_OPTIONS.length - 1 && styles.wideCard,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => handleSelectType(option.value)}
+              accessibilityRole="button"
+              accessibilityLabel={option.label}
+            >
+              <View style={styles.iconBox}>
+                <Text style={styles.optionIcon}>{option.icon}</Text>
+              </View>
+              <View style={styles.cardTitleRow}>
+                <Text style={styles.optionLabel} numberOfLines={1}>{option.label}</Text>
+                <Text style={styles.chevron}>›</Text>
+              </View>
+              <Text style={styles.optionDescription} numberOfLines={2}>{option.description}</Text>
+            </Pressable>
+          ))}
+        </View>
       </Animated.View>
     </Modal>
   </AppShell>;
@@ -156,9 +182,21 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
   backdrop:{...StyleSheet.absoluteFill,backgroundColor:colors.overlay},
   sheet:{backgroundColor:colors.surface,borderTopLeftRadius:radius.xl,borderTopRightRadius:radius.xl,paddingHorizontal:spacing.lg,paddingTop:spacing.sm,paddingBottom:spacing.xl,marginTop:'auto',shadowColor:colors.text,shadowOpacity:0.08,shadowRadius:14,elevation:10},
   sheetHandle:{width:44,height:4,borderRadius:radius.pill,backgroundColor:colors.border,alignSelf:'center',marginBottom:spacing.md},
-  sheetTitle:{fontSize:22,fontWeight:'800',marginBottom:spacing.md},
-  optionRow:{flexDirection:'row',alignItems:'center',paddingVertical:spacing.md,borderBottomWidth:1,borderBottomColor:colors.border},
-  optionIcon:{fontSize:24,marginRight:spacing.md},
-  optionLabel:{fontSize:17,fontWeight:'600',color:colors.text},
+  sheetHeader:{flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between',marginBottom:spacing.lg},
+  sheetHeaderText:{flex:1,paddingRight:spacing.md},
+  sheetTitle:{fontSize:22,fontWeight:'800'},
+  sheetSubtitle:{fontSize:14,color:colors.textSecondary,marginTop:spacing.xs},
+  closeButton:{width:36,height:36,borderRadius:radius.pill,backgroundColor:colors.surfaceSecondary,alignItems:'center',justifyContent:'center'},
+  closeIcon:{fontSize:16,color:colors.text},
+  grid:{flexDirection:'row',flexWrap:'wrap',gap:spacing.md},
+  typeCard:{width:'47%',flexGrow:1,backgroundColor:colors.surface,borderRadius:radius.lg,borderWidth:1,borderColor:colors.border,padding:spacing.md,shadowColor:colors.text,shadowOpacity:0.05,shadowRadius:8,shadowOffset:{width:0,height:2},elevation:2},
+  wideCard:{width:'100%'},
+  iconBox:{width:48,height:48,borderRadius:radius.md,backgroundColor:colors.secondary,alignItems:'center',justifyContent:'center',marginBottom:spacing.md},
+  optionIcon:{fontSize:24},
+  cardTitleRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
+  optionLabel:{flexShrink:1,fontSize:16,fontWeight:'700',color:colors.text},
+  chevron:{fontSize:22,lineHeight:24,color:colors.textSecondary,marginLeft:spacing.xs},
+  optionDescription:{fontSize:12,color:colors.textSecondary,marginTop:spacing.xs},
+  cardPressed:{opacity:0.7},
 });
 }

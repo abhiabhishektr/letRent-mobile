@@ -3,12 +3,12 @@ import { tokenStorage } from "./tokenStorage";
 
 export type PropertyTypeValue = 1 | 2 | 3 | 5 | 6;
 
-export const PROPERTY_TYPE_OPTIONS: { value: PropertyTypeValue; label: string; icon: string }[] = [
-  { value: 1, label: "Residential", icon: "🏠" },
-  { value: 2, label: "Commercial", icon: "🏬" },
-  { value: 3, label: "Hostel", icon: "🏢" },
-  { value: 5, label: "Agricultural", icon: "🌾" },
-  { value: 6, label: "Other", icon: "⋯" },
+export const PROPERTY_TYPE_OPTIONS: { value: PropertyTypeValue; label: string; icon: string; description: string }[] = [
+  { value: 1, label: "Residential", icon: "🏠", description: "Apartment, House, Villa, etc." },
+  { value: 2, label: "Commercial", icon: "🏬", description: "Office, Shop, Showroom, etc." },
+  { value: 3, label: "Hostel", icon: "🏢", description: "PG, Paying Guest, Co-living" },
+  { value: 5, label: "Agricultural", icon: "🌾", description: "Farm, Land, Plantation, etc." },
+  { value: 6, label: "Other", icon: "⋯", description: "Any other property type" },
 ];
 
 export const PROPERTY_TYPE_LABELS = Object.fromEntries(
