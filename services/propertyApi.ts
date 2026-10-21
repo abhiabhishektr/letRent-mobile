@@ -1,7 +1,24 @@
 import { apiClient, getErrorMessage } from "./api";
 import { tokenStorage } from "./tokenStorage";
 
-export type PropertyTypeValue = "HOSTEL" | "RESIDENTIAL" | "RENTAL_ITEM" | "OTHER";
+export type PropertyTypeValue = 1 | 2 | 3 | 5 | 6;
+
+export const PROPERTY_TYPE_OPTIONS: { value: PropertyTypeValue; label: string; icon: string }[] = [
+  { value: 1, label: "Residential", icon: "🏠" },
+  { value: 2, label: "Commercial", icon: "🏬" },
+  { value: 3, label: "Hostel", icon: "🏢" },
+  { value: 5, label: "Agricultural", icon: "🌾" },
+  { value: 6, label: "Other", icon: "⋯" },
+];
+
+export const PROPERTY_TYPE_LABELS = Object.fromEntries(
+  PROPERTY_TYPE_OPTIONS.map((o) => [o.value, o.label]),
+) as Record<PropertyTypeValue, string>;
+
+export const parsePropertyType = (value?: string | number | (string | number)[]): PropertyTypeValue => {
+  const raw = Number(Array.isArray(value) ? value[0] : value);
+  return PROPERTY_TYPE_OPTIONS.some((o) => o.value === raw) ? (raw as PropertyTypeValue) : 1;
+};
 
 export type PropertyCreateInput = {
   name: string;

@@ -17,24 +17,11 @@ import type { AppTheme } from "../../../theme";
 import {
   createProperty,
   lookupPinCode,
-  PropertyTypeValue,
+  parsePropertyType,
+  PROPERTY_TYPE_LABELS,
   updateProperty,
 } from "../../../services/propertyApi";
 import { rentRepository } from "../../../services/rentRepository";
-
-const PROPERTY_TYPE_LABELS: Record<PropertyTypeValue, string> = {
-  HOSTEL: "Hostel",
-  RESIDENTIAL: "Residential / Home",
-  RENTAL_ITEM: "Rental Items",
-  OTHER: "Others",
-};
-
-const normalizeType = (value?: string | string[]): PropertyTypeValue => {
-  const raw = Array.isArray(value) ? value[0] : value ?? "RESIDENTIAL";
-  return raw === "HOSTEL" || raw === "RESIDENTIAL" || raw === "RENTAL_ITEM" || raw === "OTHER"
-    ? raw
-    : "RESIDENTIAL";
-};
 
 export default function AddPropertyDetails() {
   const router = useRouter();
@@ -49,7 +36,7 @@ export default function AddPropertyDetails() {
     pincode?: string | string[];
   }>();
   const isEditMode = params.mode === "edit";
-  const propertyType = normalizeType(params.propertyType);
+  const propertyType = parsePropertyType(params.propertyType);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");

@@ -13,7 +13,7 @@ export type Property = {
   address: string;
   units: string;
   occupied: string;
-  property_type?: string;
+  property_type?: number;
   city?: string;
   state?: string;
   pincode?: string;
@@ -23,9 +23,9 @@ export type PropertyQuery = { search?: string };
 export type TenantQuery = { search?: string; status?: OwnerTenant['status'] | ''; date?: string; property?: string };
 
 const PROPERTIES: Property[] = [
-  { id: 'property-1', name: 'Green View Apartments', address: 'Koramangala, Bengaluru', units: '8 units', occupied: '7 occupied', property_type: 'RESIDENTIAL' },
-  { id: 'property-2', name: 'Lake Side Residency', address: 'HSR Layout, Bengaluru', units: '6 units', occupied: '5 occupied', property_type: 'RESIDENTIAL' },
-  { id: 'property-3', name: 'Palm Grove Villa', address: 'Indiranagar, Bengaluru', units: '2 units', occupied: '2 occupied', property_type: 'RESIDENTIAL' },
+  { id: 'property-1', name: 'Green View Apartments', address: 'Koramangala, Bengaluru', units: '8 units', occupied: '7 occupied', property_type: 1 },
+  { id: 'property-2', name: 'Lake Side Residency', address: 'HSR Layout, Bengaluru', units: '6 units', occupied: '5 occupied', property_type: 1 },
+  { id: 'property-3', name: 'Palm Grove Villa', address: 'Indiranagar, Bengaluru', units: '2 units', occupied: '2 occupied', property_type: 1 },
 ];
 const OWNER_TENANTS: OwnerTenant[] = [
   { id: 'c1', tenant: 'Rahul Sharma', unit: 'Unit 101', property: 'Green View Apartments', amount: 12000, date: '1 Sep 2025', dateKey: '2025-09', status: 'Paid' },

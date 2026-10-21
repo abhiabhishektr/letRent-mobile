@@ -13,14 +13,7 @@ import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
 import { useThemedStyles } from '../../theme';
 import type { AppTheme } from '../../theme';
-import { getProperties, PropertyResponse } from '../../services/propertyApi';
-
-const PROPERTY_TYPE_OPTIONS = [
-  { value: 'HOSTEL', label: 'Hostel', icon: '🏢' },
-  { value: 'RESIDENTIAL', label: 'Residential / Home', icon: '🏠' },
-  { value: 'RENTAL_ITEM', label: 'Rental Items', icon: '📦' },
-  { value: 'OTHER', label: 'Others', icon: '⋯' },
-] as const;
+import { getProperties, PROPERTY_TYPE_OPTIONS, PropertyResponse } from '../../services/propertyApi';
 
 export default function Properties() {
   const [search, setSearch] = useState('');
@@ -80,9 +73,9 @@ export default function Properties() {
     }
   }, [showAddModal, backdropOpacity, sheetTranslate]);
 
-  const handleSelectType = (value: string) => {
+  const handleSelectType = (value: number) => {
     setShowAddModal(false);
-    router.push({ pathname: '/owner/properties/add', params: { propertyType: value } });
+    router.push({ pathname: '/owner/properties/add', params: { propertyType: String(value) } });
   };
 
   const handleView = (property: PropertyResponse) => {

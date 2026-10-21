@@ -15,15 +15,8 @@ import {
   deleteProperty,
   getProperty,
   PropertyResponse,
-  PropertyTypeValue,
+  PROPERTY_TYPE_LABELS,
 } from "../../../services/propertyApi";
-
-const PROPERTY_TYPE_LABELS: Record<PropertyTypeValue, string> = {
-  HOSTEL: "Hostel",
-  RESIDENTIAL: "Residential / Home",
-  RENTAL_ITEM: "Rental Items",
-  OTHER: "Others",
-};
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
@@ -65,7 +58,7 @@ export default function PropertyDetailScreen() {
       params: {
         mode: "edit",
         propertyId: String(property.id),
-        propertyType: property.property_type,
+        propertyType: String(property.property_type),
         name: property.name,
         address: property.address,
         city: property.city,
