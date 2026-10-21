@@ -11,7 +11,7 @@ import { AppText as Text } from '../../components/AppText';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
-import { useThemedStyles } from '../../theme';
+import { createPlatformShadow, useThemedStyles } from '../../theme';
 import type { AppTheme } from '../../theme';
 import { getProperties, PROPERTY_TYPE_OPTIONS, PropertyResponse } from '../../services/propertyApi';
 
@@ -168,7 +168,7 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
   addButton:{width:34,height:34,borderRadius:radius.pill,backgroundColor:colors.secondary,alignItems:'center',justifyContent:'center',marginTop:spacing.sm},
   addIcon:{fontSize:24,color:colors.primary,fontWeight:'700'},
   sub:{color:colors.textSecondary,fontSize:13,marginTop:4,marginBottom:spacing.lg},
-  card:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.border,borderRadius:radius.md,padding:spacing.md,marginBottom:spacing.sm,shadowColor:colors.text,shadowOpacity:0.06,shadowRadius:8,elevation:2},
+  card:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.border,borderRadius:radius.md,padding:spacing.md,marginBottom:spacing.sm,...createPlatformShadow({color:colors.text,opacity:0.06,radius:8,elevation:2})},
   cardBody:{flexDirection:'row',alignItems:'center',gap:12},
   icon:{backgroundColor:colors.successBackground,padding:12,borderRadius:radius.sm},
   cardContent:{flex:1},
@@ -180,7 +180,7 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
   emptyCopy:{fontSize:13,color:colors.textSecondary,marginTop:4},
   modalBackdrop:{flex:1,justifyContent:'flex-end'},
   backdrop:{...StyleSheet.absoluteFill,backgroundColor:colors.overlay},
-  sheet:{backgroundColor:colors.surface,borderTopLeftRadius:radius.xl,borderTopRightRadius:radius.xl,paddingHorizontal:spacing.lg,paddingTop:spacing.sm,paddingBottom:spacing.xl,marginTop:'auto',shadowColor:colors.text,shadowOpacity:0.08,shadowRadius:14,elevation:10},
+  sheet:{backgroundColor:colors.surface,borderTopLeftRadius:radius.xl,borderTopRightRadius:radius.xl,paddingHorizontal:spacing.lg,paddingTop:spacing.sm,paddingBottom:spacing.xl,marginTop:'auto',...createPlatformShadow({color:colors.text,opacity:0.08,radius:14,elevation:10})},
   sheetHandle:{width:44,height:4,borderRadius:radius.pill,backgroundColor:colors.border,alignSelf:'center',marginBottom:spacing.md},
   sheetHeader:{flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between',marginBottom:spacing.lg},
   sheetHeaderText:{flex:1,paddingRight:spacing.md},
@@ -189,7 +189,7 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
   closeButton:{width:36,height:36,borderRadius:radius.pill,backgroundColor:colors.surfaceSecondary,alignItems:'center',justifyContent:'center'},
   closeIcon:{fontSize:16,color:colors.text},
   grid:{flexDirection:'row',flexWrap:'wrap',gap:spacing.md},
-  typeCard:{width:'47%',flexGrow:1,backgroundColor:colors.surface,borderRadius:radius.lg,borderWidth:1,borderColor:colors.border,padding:spacing.md,shadowColor:colors.text,shadowOpacity:0.05,shadowRadius:8,shadowOffset:{width:0,height:2},elevation:2},
+  typeCard:{width:'47%',flexGrow:1,backgroundColor:colors.surface,borderRadius:radius.lg,borderWidth:1,borderColor:colors.border,padding:spacing.md,...createPlatformShadow({color:colors.text,opacity:0.05,radius:8,offset:{width:0,height:2},elevation:2})},
   wideCard:{width:'100%'},
   iconBox:{width:48,height:48,borderRadius:radius.md,backgroundColor:colors.secondary,alignItems:'center',justifyContent:'center',marginBottom:spacing.md},
   optionIcon:{fontSize:24},

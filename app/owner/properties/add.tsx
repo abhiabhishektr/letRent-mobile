@@ -12,7 +12,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
 import { Screen } from "../../../components/Screen";
-import { useTheme, useThemedStyles } from "../../../theme";
+import {
+  createPlatformShadow,
+  useTheme,
+  useThemedStyles,
+} from "../../../theme";
 import type { AppTheme } from "../../../theme";
 import {
   createProperty,
@@ -326,10 +330,12 @@ function createStyles({ colors, spacing, typography, radius }: AppTheme) {
     alignItems: "center",
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 6,
+    ...createPlatformShadow({
+      color: colors.text,
+      opacity: 0.08,
+      radius: 18,
+      elevation: 6,
+    }),
   },
   successBadge: {
     width: 84,

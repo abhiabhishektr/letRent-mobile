@@ -24,7 +24,7 @@ import * as WebBrowser from "expo-web-browser";
 
 import { AnimatedBottomSheet } from "../components/AnimatedBottomSheet";
 import { Button } from "../components/Button";
-import { useTheme, useThemedStyles } from "../theme";
+import { createPlatformShadow, useTheme, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
@@ -366,20 +366,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderRadius: 16,
     height: 56,
 
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-
-      android: {
-        elevation: 3,
-      },
+    ...createPlatformShadow({
+      color: colors.primary,
+      opacity: 0.2,
+      radius: 8,
+      offset: { width: 0, height: 4 },
+      android: { elevation: 3 },
     }),
   },
 

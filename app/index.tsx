@@ -6,7 +6,7 @@ import LottieView from "lottie-react-native";
 import { AppText as Text } from "../components/AppText";
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
-import { useThemedStyles } from "../theme";
+import { createPlatformShadow, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
@@ -124,14 +124,13 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderRadius: width * 0.4,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 2,
+    ...createPlatformShadow({
+      color: colors.primary,
+      opacity: 0.05,
+      radius: 20,
+      offset: { width: 0, height: 10 },
+      elevation: 2,
+    }),
   },
   animation: {
     width: "110%",
@@ -142,11 +141,13 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     width: "100%",
   },
   primaryButton: {
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 4,
+    ...createPlatformShadow({
+      color: colors.primary,
+      opacity: 0.2,
+      radius: 12,
+      offset: { width: 0, height: 8 },
+      elevation: 4,
+    }),
   },
   skipButton: {
     alignItems: "center",

@@ -31,6 +31,7 @@ Files in [theme/](../theme):
 - [colors.ts](../theme/colors.ts): `brandColors` (`blue`, `green`), `palettes` (`light`, `dark`), type `ThemeColors`, legacy `colors` (= light palette).
 - [ThemeProvider.tsx](../theme/ThemeProvider.tsx): `ThemeProvider`, `useTheme()` (throws outside provider), type `AppTheme` = `{ colorScheme, colors, radius, spacing, typography }`.
 - [useThemedStyles.ts](../theme/useThemedStyles.ts): `useThemedStyles(createStyles)`.
+- [platformShadow.ts](../theme/platformShadow.ts): `createPlatformShadow` maps theme shadow tokens to web `boxShadow` and native shadow styles.
 - [spacing.ts](../theme/spacing.ts): `xs 4, sm 8, md 12, lg 16, xl 24, xxl 32`. [radius.ts](../theme/radius.ts): `sm 8, md 12, lg 16, xl 24, pill 999`.
 - [typography.ts](../theme/typography.ts), [index.ts](../theme/index.ts) (re-exports everything above).
 

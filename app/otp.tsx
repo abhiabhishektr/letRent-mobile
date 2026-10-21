@@ -16,7 +16,11 @@ import { AntDesign } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { Button } from "../components/Button";
-import { useTheme, useThemedStyles } from "../theme";
+import {
+  createPlatformShadow,
+  useTheme,
+  useThemedStyles,
+} from "../theme";
 import type { AppTheme } from "../theme";
 import { useAuth } from "../context/AuthContext";
 
@@ -278,17 +282,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
   otpCellActive: {
     borderColor: colors.primary,
     backgroundColor: colors.surface,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-        shadowColor: colors.primary,
-      },
+    ...createPlatformShadow({
+      color: colors.primary,
+      opacity: 0.15,
+      radius: 8,
+      offset: { width: 0, height: 4 },
+      android: { elevation: 4, shadowColor: colors.primary },
     }),
   },
   otpText: {
@@ -313,16 +312,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderRadius: radius.lg,
     height: 56,
     marginBottom: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.18,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
+    ...createPlatformShadow({
+      color: colors.primary,
+      opacity: 0.18,
+      radius: 12,
+      offset: { width: 0, height: 8 },
+      android: { elevation: 4 },
     }),
   },
   resendButton: {

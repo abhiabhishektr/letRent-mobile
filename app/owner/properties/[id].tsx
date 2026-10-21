@@ -9,7 +9,11 @@ import {
 import { AppText as Text } from "../../../components/AppText";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "../../../components/Screen";
-import { useTheme, useThemedStyles } from "../../../theme";
+import {
+  createPlatformShadow,
+  useTheme,
+  useThemedStyles,
+} from "../../../theme";
 import type { AppTheme } from "../../../theme";
 import {
   deleteProperty,
@@ -204,10 +208,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: 6,
-    shadowColor: colors.text,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 6,
+    ...createPlatformShadow({
+      color: colors.text,
+      opacity: 0.08,
+      radius: 12,
+      elevation: 6,
+    }),
     zIndex: 10,
   },
   menuItem: { paddingHorizontal: 12, paddingVertical: 10 },
@@ -221,10 +227,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderRadius: radius.lg,
     padding: spacing.lg,
     marginBottom: spacing.lg,
-    shadowColor: colors.text,
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    ...createPlatformShadow({
+      color: colors.text,
+      opacity: 0.06,
+      radius: 10,
+      elevation: 2,
+    }),
   },
   heroLabel: { fontSize: 12, color: colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.4 },
   typeBadge: {

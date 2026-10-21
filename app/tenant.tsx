@@ -6,7 +6,7 @@ import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
 import { ModeSwitch } from "../components/ModeSwitch";
 import { rentRepository } from "../services/rentRepository";
-import { useThemedStyles } from "../theme";
+import { createPlatformShadow, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 export default function Tenant() {
   const [data, setData] = useState<any>();
@@ -89,10 +89,12 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderRadius: radius.md,
     padding: spacing.lg,
     marginTop: spacing.lg,
-    shadowColor: colors.text,
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 2,
+    ...createPlatformShadow({
+      color: colors.text,
+      opacity: 0.08,
+      radius: 10,
+      elevation: 2,
+    }),
   },
   row: { flexDirection: "row", justifyContent: "space-between" },
   month: { fontWeight: "800", fontSize: 15 },
