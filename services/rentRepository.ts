@@ -18,11 +18,29 @@ export type Property = {
   state?: string;
   pincode?: string;
 };
-export type OwnerTenant = Collection & { property: string; dateKey: string };
+export type OwnerTenant = Collection & {
+  property: string;
+  dateKey: string;
+  propertyId?: string;
+  mobileNumber?: string;
+  paymentFrequency?: PaymentFrequency;
+  collectionDate?: string;
+};
+export type PaymentFrequency = "Daily" | "Monthly" | "Yearly";
+export type NewOwnerTenant = {
+  propertyId: string;
+  property: string;
+  tenant: string;
+  mobileNumber: string;
+  unit?: string;
+  amount: number;
+  paymentFrequency: PaymentFrequency;
+  collectionDate: string;
+};
 export type PropertyQuery = { search?: string };
 export type TenantQuery = { search?: string; status?: OwnerTenant['status'] | ''; date?: string; property?: string };
 
-const PROPERTIES: Property[] = [
+export const DEMO_PROPERTIES: Property[] = [
   { id: 'property-1', name: 'Green View Apartments', address: 'Koramangala, Bengaluru', units: '8 units', occupied: '7 occupied', property_type: 1 },
   { id: 'property-2', name: 'Lake Side Residency', address: 'HSR Layout, Bengaluru', units: '6 units', occupied: '5 occupied', property_type: 1 },
   { id: 'property-3', name: 'Palm Grove Villa', address: 'Indiranagar, Bengaluru', units: '2 units', occupied: '2 occupied', property_type: 1 },
@@ -33,6 +51,7 @@ const OWNER_TENANTS: OwnerTenant[] = [
   { id: 'c3', tenant: 'Vikram Shah', unit: 'Unit 103', property: 'Green View Apartments', amount: 10500, date: '1 Sep 2025', dateKey: '2025-09', status: 'Due' },
   { id: 'c4', tenant: 'Priya Menon', unit: 'Unit 305', property: 'Palm Grove Villa', amount: 18000, date: '1 Aug 2025', dateKey: '2025-08', status: 'Late Fee' },
 ];
+let nextOwnerTenantId = 1;
 export const rentRepository = {
   async getTenantDashboard() {
     return {
@@ -65,7 +84,7 @@ export const rentRepository = {
   },
   async getProperties(query: PropertyQuery = {}): Promise<Property[]> {
     const search = query.search?.trim().toLowerCase() ?? '';
-    return !search ? [...PROPERTIES] : PROPERTIES.filter((property) => `${property.name} ${property.address}`.toLowerCase().includes(search));
+    return !search ? [...DEMO_PROPERTIES] : DEMO_PROPERTIES.filter((property) => `${property.name} ${property.address}`.toLowerCase().includes(search));
   },
   async addProperty(property: Omit<Property, 'id' | 'units' | 'occupied'> & Partial<Pick<Property, 'id' | 'units' | 'occupied'>>): Promise<Property> {
     const created: Property = {
@@ -79,8 +98,31 @@ export const rentRepository = {
       state: property.state,
       pincode: property.pincode,
     };
-    PROPERTIES.unshift(created);
+    DEMO_PROPERTIES.unshift(created);
     return created;
+  },
+  async addOwnerTenant(input: NewOwnerTenant): Promise<OwnerTenant> {
+    const collectionDate = new Date(`${input.collectionDate}T00:00:00`);
+    const tenant: OwnerTenant = {
+      id: `tenant-${Date.now()}-${nextOwnerTenantId++}`,
+      tenant: input.tenant,
+      unit: input.unit ?? "",
+      property: input.property,
+      propertyId: input.propertyId,
+      mobileNumber: input.mobileNumber,
+      amount: input.amount,
+      paymentFrequency: input.paymentFrequency,
+      collectionDate: input.collectionDate,
+      date: collectionDate.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
+      dateKey: input.collectionDate.slice(0, 7),
+      status: "Due",
+    };
+    OWNER_TENANTS.unshift(tenant);
+    return tenant;
   },
   async getOwnerTenants(query: TenantQuery = {}): Promise<OwnerTenant[]> {
     const search = query.search?.trim().toLowerCase() ?? '';

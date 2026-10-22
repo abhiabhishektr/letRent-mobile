@@ -70,7 +70,7 @@ All in [components/](../components); they read the theme via `useTheme`/`useThem
 - [ConfirmDialog](../components/ConfirmDialog.tsx): exports only `confirmDelete(name, onConfirm)`, an `Alert.alert` wrapper with fixed "Delete user" copy. Not themed; no usages found in `app/` or `components/`.
 - [Loading](../components/Loading.tsx): centered `ActivityIndicator` on the themed background.
 - [SearchFilterBar](../components/SearchFilterBar.tsx): `query`, `onQueryChange`, `placeholder`, optional `filters`, `selectedFilters`, `onFilterChange`; exports type `FilterGroup`. Filtering itself is done by the caller.
-- [AnimatedBottomSheet](../components/AnimatedBottomSheet.tsx): `children`, `onClose`. Reanimated + gesture-handler, pan-to-close, backdrop. Used by `login`.
+- [AnimatedBottomSheet](../components/AnimatedBottomSheet.tsx): `children`, `onClose`, optional animation timings/spring configuration and close accessibility label. Reanimated + gesture-handler, pan-to-close, backdrop. Used by `login` and the owner tenant form.
 - [ModeSwitch](../components/ModeSwitch.tsx): tenant/owner toggle via `useAuth().switchMode`. This switches app role, not appearance.
 - [ModeTransitionLoader](../components/ModeTransitionLoader.tsx): full-screen overlay with pulsing logo while `isModeSwitching`.
 
@@ -87,7 +87,7 @@ Extend by adding props/variants to the existing component; create a new componen
 - [services/propertyApi.ts](../services/propertyApi.ts): `lookupPinCode` (external postal-pincode API), `getProperties`, `getProperty`, `createProperty`, `updateProperty`, `deleteProperty`, plus input/response types. Reads the Bearer token from `tokenStorage`; throws if absent.
 - [services/tokenStorage.ts](../services/tokenStorage.ts): `setTokens`, `getAccessToken`, `getRefreshToken`, `clearTokens` (SecureStore).
 - [services/storage.ts](../services/storage.ts): JSON AsyncStorage wrapper (`get`, `set`, `remove`).
-- [services/rentRepository.ts](../services/rentRepository.ts): **mock** data: `getTenantDashboard`, `getOwnerDashboard`, `getProperties`, `addProperty`, `getOwnerTenants`, `getReceipts`.
+- [services/rentRepository.ts](../services/rentRepository.ts): **mock** data: `getTenantDashboard`, `getOwnerDashboard`, `getProperties`, `addProperty`, `getOwnerTenants`, `addOwnerTenant`, `getReceipts`. Tenant additions and demo property data are in memory only.
 - [services/bankAccountRepository.ts](../services/bankAccountRepository.ts): **local** AsyncStorage CRUD (`letrent_bank_accounts`, seeded samples): `getAccounts`, `addAccount`, `deleteAccount`, `setReceivingAccount`.
 
 ## G. Common development tasks
@@ -107,6 +107,7 @@ Confirmed:
 - Legacy theme aliases remain (`colors` export, `secondaryText`, `disabled`, typography aliases). Many screens still use inline font sizes/weights and some hardcoded small paddings/radii.
 - `AppShell.active` unused; `ConfirmDialog` unused and unthemed; `utils/validation.ts` unused; `Button` has no extra variants.
 - Only auth and property endpoints use the real API. Dashboards, receipts, owner tenants and bank accounts are mock/local.
+- The owner tenant add form uses local demo properties, validates tenant and rent details, and stores its collection date as `YYYY-MM-DD`; new tenants are not persisted across app restarts.
 - No token refresh logic. `getProperty` requests `/api/properties/${id}` without a trailing slash, unlike the other property calls.
 - `verifyOtp` in `AuthContext` falls back to a demo user when the API fails and the OTP is `1234`; the OTP UI is 6 digits, so it is likely unreachable. Security-sensitive; investigate before touching.
 - Several screens use `any` for data.

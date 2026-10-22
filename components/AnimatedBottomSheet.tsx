@@ -3,6 +3,7 @@ import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-worklets";
 import Animated, {
+  type WithSpringConfig,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -12,12 +13,32 @@ import Animated, {
 import { useTheme } from "../theme";
 
 type Props = {
-  children: React.ReactNode;
+  children: React.ReactNode | ((close: () => void) => React.ReactNode);
   onClose: () => void;
+  animation?: {
+    openSpringConfig?: WithSpringConfig;
+    closeDuration?: number;
+    backdropOpenDuration?: number;
+    backdropCloseDuration?: number;
+  };
+  accessibilityLabel?: string;
 };
 
-export function AnimatedBottomSheet({ children, onClose }: Props) {
+const DEFAULT_ANIMATION = {
+  openSpringConfig: { damping: 24, stiffness: 220 },
+  closeDuration: 220,
+  backdropOpenDuration: 220,
+  backdropCloseDuration: 180,
+} satisfies NonNullable<Props["animation"]>;
+
+export function AnimatedBottomSheet({
+  children,
+  onClose,
+  animation,
+  accessibilityLabel = "Close login",
+}: Props) {
   const { colors, radius } = useTheme();
+  const animationConfig = { ...DEFAULT_ANIMATION, ...animation };
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -65,16 +86,24 @@ export function AnimatedBottomSheet({ children, onClose }: Props) {
   const close = useCallback(() => {
     if (isClosing.value) return;
     isClosing.value = true;
-    backdropOpacity.value = withTiming(0, { duration: 180 });
-    sheetY.value = withTiming(windowHeight.value, { duration: 220 }, (finished) => {
-      if (finished) runOnJS(onClose)();
+    backdropOpacity.value = withTiming(0, {
+      duration: animationConfig.backdropCloseDuration,
     });
-  }, [backdropOpacity, isClosing, onClose, sheetY, windowHeight]);
+    sheetY.value = withTiming(
+      windowHeight.value,
+      { duration: animationConfig.closeDuration },
+      (finished) => {
+        if (finished) runOnJS(onClose)();
+      },
+    );
+  }, [animationConfig.backdropCloseDuration, animationConfig.closeDuration, backdropOpacity, isClosing, onClose, sheetY, windowHeight]);
 
   useEffect(() => {
-    sheetY.value = withSpring(0, { damping: 24, stiffness: 220 });
-    backdropOpacity.value = withTiming(1, { duration: 220 });
-  }, [backdropOpacity, sheetY, windowHeight]);
+    sheetY.value = withSpring(0, animationConfig.openSpringConfig);
+    backdropOpacity.value = withTiming(1, {
+      duration: animationConfig.backdropOpenDuration,
+    });
+  }, [animationConfig.backdropOpenDuration, animationConfig.openSpringConfig, backdropOpacity, sheetY, windowHeight]);
 
   const panGesture = Gesture.Pan()
     .activeOffsetY(8)
@@ -88,7 +117,7 @@ export function AnimatedBottomSheet({ children, onClose }: Props) {
       if (event.translationY > 100 || event.velocityY > 800) {
         runOnJS(close)();
       } else if (!isClosing.value) {
-        sheetY.value = withSpring(0, { damping: 24, stiffness: 220 });
+        sheetY.value = withSpring(0, animationConfig.openSpringConfig);
       }
     });
 
@@ -98,12 +127,13 @@ export function AnimatedBottomSheet({ children, onClose }: Props) {
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: sheetY.value }],
   }));
+  const content = typeof children === "function" ? children(close) : children;
 
   return (
     <View style={styles.container}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Close login"
+        accessibilityLabel={accessibilityLabel}
         onPress={close}
         style={StyleSheet.absoluteFill}
       >
@@ -115,7 +145,7 @@ export function AnimatedBottomSheet({ children, onClose }: Props) {
             <View style={styles.dragHandle} />
           </View>
         </GestureDetector>
-        {children}
+        {content}
       </Animated.View>
     </View>
   );
