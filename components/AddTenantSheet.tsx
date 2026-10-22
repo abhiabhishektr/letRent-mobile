@@ -253,8 +253,9 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
             behavior={Platform.OS === "ios" ? "padding" : undefined}
           >
           <View style={styles.header}>
-            <View>
-              <Text variant="heading">Add tenant</Text>
+            <View style={styles.headerCopy}>
+              <Text variant="caption" style={styles.eyebrow}>NEW RENTAL</Text>
+              <Text variant="heading" style={styles.title}>Add a tenant</Text>
               <Text variant="bodySmall" color="textSecondary">
                 Add tenant details and rent schedule
               </Text>
@@ -275,7 +276,21 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
             ]}
             keyboardShouldPersistTaps="handled"
           >
-            <Text variant="label" style={styles.fieldLabel}>Property *</Text>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionNumber}>
+                  <Text variant="caption" style={styles.sectionNumberText}>1</Text>
+                </View>
+                <View style={styles.sectionCopy}>
+                  <Text variant="subheading" style={styles.sectionTitle}>
+                    Property details
+                  </Text>
+                  <Text variant="caption" color="textSecondary">
+                    Choose where the tenant will be staying
+                  </Text>
+                </View>
+              </View>
+              <Text variant="label" style={styles.fieldLabel}>Property *</Text>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Select property"
@@ -310,7 +325,47 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                 ))}
               </View>
             ) : null}
+              <View style={styles.unitLabelRow}>
+                <Text variant="label" style={styles.fieldLabel}>
+                  Room number / unit identifier
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="About the unit or vehicle identifier"
+                  onPress={() =>
+                    Alert.alert(
+                      "Unit or vehicle identifier",
+                      "For a property rental, enter the room or unit number (for example, 101 or A-204). For a vehicle rental, use this field for the vehicle registration number.",
+                    )
+                  }
+                  style={styles.helpButton}
+                >
+                  <Text variant="caption" style={styles.helpText}>?</Text>
+                </Pressable>
+              </View>
+              <Input
+                label=""
+                placeholder="e.g. 101, A-204, or Room 3"
+                value={values.unit}
+                onChangeText={(value) => updateValue("unit", value)}
+                autoCapitalize="characters"
+              />
+            </View>
 
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionNumber}>
+                  <Text variant="caption" style={styles.sectionNumberText}>2</Text>
+                </View>
+                <View style={styles.sectionCopy}>
+                  <Text variant="subheading" style={styles.sectionTitle}>
+                    Tenant information
+                  </Text>
+                  <Text variant="caption" color="textSecondary">
+                    Add the tenant's contact details
+                  </Text>
+                </View>
+              </View>
             <Input
               label="Tenant name *"
               placeholder="Enter full name"
@@ -328,31 +383,22 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
               maxLength={14}
               error={errors.mobileNumber}
             />
-            <View style={styles.unitLabelRow}>
-              <Text variant="label" style={styles.fieldLabel}>
-                Room number / unit identifier
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="About the unit or vehicle identifier"
-                onPress={() =>
-                  Alert.alert(
-                    "Unit or vehicle identifier",
-                    "For a property rental, enter the room or unit number (for example, 101 or A-204). For a vehicle rental, use this field for the vehicle registration number.",
-                  )
-                }
-                style={styles.helpButton}
-              >
-                <Text variant="caption" style={styles.helpText}>?</Text>
-              </Pressable>
             </View>
-            <Input
-              label=""
-              placeholder="e.g. 101, A-204, or Room 3"
-              value={values.unit}
-              onChangeText={(value) => updateValue("unit", value)}
-              autoCapitalize="characters"
-            />
+
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionNumber}>
+                  <Text variant="caption" style={styles.sectionNumberText}>3</Text>
+                </View>
+                <View style={styles.sectionCopy}>
+                  <Text variant="subheading" style={styles.sectionTitle}>
+                    Rent schedule
+                  </Text>
+                  <Text variant="caption" color="textSecondary">
+                    Set the rent amount and collection timing
+                  </Text>
+                </View>
+              </View>
             <Input
               label="Rent amount *"
               placeholder="₹ 12,000"
@@ -503,6 +549,7 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                 </View>
               </View>
             ) : null}
+            </View>
 
             <View style={styles.actions}>
               <Button
@@ -539,6 +586,13 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
       paddingTop: spacing.xs,
       paddingBottom: spacing.md,
     },
+    headerCopy: { flex: 1, gap: spacing.xs },
+    eyebrow: {
+      color: colors.primary,
+      fontWeight: "800",
+      letterSpacing: 1,
+    },
+    title: { color: colors.text },
     closeButton: {
       width: 40,
       height: 40,
@@ -548,9 +602,42 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
       backgroundColor: colors.surfaceSecondary,
     },
     closeIcon: { fontSize: 28, lineHeight: 30, color: colors.textSecondary },
-    formContent: { paddingHorizontal: spacing.lg, paddingTop: spacing.xs },
+    formContent: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+    },
+    section: {
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      marginBottom: spacing.lg,
+    },
+    sectionNumber: {
+      width: 32,
+      height: 32,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: radius.pill,
+      backgroundColor: colors.secondary,
+    },
+    sectionNumberText: { color: colors.primary, fontWeight: "800" },
+    sectionCopy: { flex: 1, gap: spacing.xs },
+    sectionTitle: { color: colors.text },
     fieldLabel: { color: colors.text, marginBottom: spacing.xs },
-    unitLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+    unitLabelRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
     helpButton: {
       width: 20,
       height: 20,
@@ -639,7 +726,7 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     actions: {
       flexDirection: "row",
       gap: spacing.sm,
-      marginTop: spacing.lg,
+      marginTop: spacing.xs,
     },
     actionButton: { flex: 1 },
   });
