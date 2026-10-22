@@ -10,7 +10,7 @@ import { StatusBar } from "expo-status-bar";
 
 function RootNavigator() {
   const { currentUser, isModeSwitching } = useAuth();
-  const { colorScheme } = useTheme();
+  const { colorScheme, colors } = useTheme();
   const pathname = usePathname();
   const active = pathname.startsWith('/tenant/payment')
     ? 'Payment'
@@ -20,10 +20,10 @@ function RootNavigator() {
         ? 'Properties'
         : pathname.startsWith('/owner/tenants')
           ? 'Tenants'
-          : pathname.startsWith('/profile') || pathname.startsWith('/edit-profile') || pathname.startsWith('/owner/bank-accounts')
+          : pathname.startsWith('/profile') || pathname.startsWith('/edit-profile') || pathname.startsWith('/notifications') || pathname.startsWith('/owner/bank-accounts')
             ? 'More'
             : 'Home';
-  const showBottomNav = Boolean(currentUser) && (pathname.startsWith('/tenant') || pathname.startsWith('/owner') || pathname.startsWith('/profile') || pathname.startsWith('/edit-profile'));
+  const showBottomNav = Boolean(currentUser) && (pathname.startsWith('/tenant') || pathname.startsWith('/owner') || pathname.startsWith('/profile') || pathname.startsWith('/edit-profile') || pathname.startsWith('/notifications'));
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -31,7 +31,7 @@ function RootNavigator() {
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <View style={styles.stack}>
           <Stack
-            screenOptions={{ headerShown: false, animation: "none" }}
+            screenOptions={{ headerShown: false, animation: "none", contentStyle: { backgroundColor: colors.background } }}
           >
             <Stack.Screen
               name="login"

@@ -4,11 +4,13 @@ import {
   Animated,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 import { AppText as Text } from '../../components/AppText';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { AnimatedFab } from '../../components/AnimatedFab';
 import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
 import { createPlatformShadow, useThemedStyles } from '../../theme';
@@ -88,13 +90,11 @@ export default function Properties() {
     return `${property.name} ${property.address} ${property.city} ${property.state}`.toLowerCase().includes(query);
   });
 
-  return <AppShell active="Properties" scroll style={styles.content}>
+  return <AppShell active="Properties" style={styles.screenContent}>
+    <ScrollView style={styles.listScroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
     <View style={styles.headerRow}>
       <Text onPress={() => router.back()} style={styles.back}>‹</Text>
       <Text style={styles.title}>Properties</Text>
-      <Pressable onPress={() => setShowAddModal(true)} style={styles.addButton} accessibilityRole="button">
-        <Text style={styles.addIcon}>＋</Text>
-      </Pressable>
     </View>
     <Text style={styles.sub}>12 properties · 24 units</Text>
     <SearchFilterBar query={search} onQueryChange={setSearch} placeholder="Search properties or location" />
@@ -110,6 +110,9 @@ export default function Properties() {
       </Pressable>
     </View>)}
     {!filteredProperties.length ? <View style={styles.empty}><Text style={styles.emptyTitle}>No properties found</Text><Text style={styles.emptyCopy}>Try searching by property name or location.</Text></View> : null}
+    </ScrollView>
+
+    <AnimatedFab label="Add property" onPress={() => setShowAddModal(true)} />
 
     <Modal transparent visible={showAddModal} animationType="fade" onRequestClose={() => setShowAddModal(false)}>
       <Pressable style={styles.modalBackdrop} onPress={() => setShowAddModal(false)}>
@@ -161,12 +164,12 @@ export default function Properties() {
 }
 function createStyles({ colors, spacing, radius }: AppTheme) {
   return StyleSheet.create({
-  content:{padding:spacing.lg,paddingBottom:spacing.xxl},
+  screenContent:{flex:1,padding:0},
+  listScroll:{flex:1},
+  content:{padding:spacing.lg,paddingBottom:spacing.xxl + 56},
   headerRow:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
-  back:{fontSize:36,lineHeight:35,flex:1},
+  back:{fontSize:36,lineHeight:35,marginRight:spacing.md},
   title:{fontSize:24,fontWeight:'800',marginTop:spacing.sm,flex: 1},
-  addButton:{width:34,height:34,borderRadius:radius.pill,backgroundColor:colors.secondary,alignItems:'center',justifyContent:'center',marginTop:spacing.sm},
-  addIcon:{fontSize:24,color:colors.primary,fontWeight:'700'},
   sub:{color:colors.textSecondary,fontSize:13,marginTop:4,marginBottom:spacing.lg},
   card:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.border,borderRadius:radius.md,padding:spacing.md,marginBottom:spacing.sm,...createPlatformShadow({color:colors.text,opacity:0.06,radius:8,elevation:2})},
   cardBody:{flexDirection:'row',alignItems:'center',gap:12},

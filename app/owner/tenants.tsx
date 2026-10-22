@@ -1,11 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 import { AddTenantSheet } from "../../components/AddTenantSheet";
+import { AnimatedFab } from "../../components/AnimatedFab";
 import { AppText as Text } from "../../components/AppText";
 import { AppShell } from "../../components/AppShell";
-import { Button } from "../../components/Button";
 import { FilterGroup, SearchFilterBar } from "../../components/SearchFilterBar";
 import {
   rentRepository,
@@ -72,7 +77,12 @@ export default function Tenants() {
   };
 
   return (
-    <AppShell active="Tenants" scroll style={styles.content}>
+    <AppShell active="Tenants" style={styles.screenContent}>
+      <ScrollView
+        style={styles.listScroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Go back"
@@ -88,11 +98,6 @@ export default function Tenants() {
             {tenants.length} matching tenant{tenants.length === 1 ? "" : "s"}
           </Text>
         </View>
-        <Button
-          title="Add Tenant"
-          onPress={() => setAddTenantVisible(true)}
-          style={styles.addButton}
-        />
       </View>
 
       <SearchFilterBar
@@ -160,7 +165,9 @@ export default function Tenants() {
           </Text>
         </View>
       ) : null}
+      </ScrollView>
 
+      <AnimatedFab label="Add tenant" onPress={() => setAddTenantVisible(true)} />
       <AddTenantSheet
         visible={addTenantVisible}
         onClose={() => setAddTenantVisible(false)}
@@ -172,7 +179,9 @@ export default function Tenants() {
 
 function createStyles({ colors, spacing, radius }: AppTheme) {
   return StyleSheet.create({
-    content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    screenContent: { flex: 1, padding: 0 },
+    listScroll: { flex: 1 },
+    content: { padding: spacing.lg, paddingBottom: spacing.xxl + 56 },
     backButton: { alignSelf: "flex-start", paddingRight: spacing.md },
     back: { fontSize: 36, lineHeight: 35, color: colors.text },
     titleRow: {
@@ -185,7 +194,6 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     },
     titleContainer: { flex: 1, gap: spacing.xs },
     title: { color: colors.text },
-    addButton: { paddingHorizontal: spacing.md },
     row: {
       flexDirection: "row",
       alignItems: "center",

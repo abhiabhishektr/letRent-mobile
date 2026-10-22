@@ -16,7 +16,7 @@ export default function Profile() {
   const menu: Array<{ icon: string; label: string; onPress: () => void }> = [
     { icon: '◉', label: 'Personal details', onPress: () => router.push('/edit-profile') },
     ...(mode === 'owner' ? [{ icon: '▣', label: 'Bank accounts', onPress: () => router.push('/owner/bank-accounts') }] : []),
-    { icon: '♢', label: 'Notifications', onPress: () => undefined },
+    { icon: '♢', label: 'Notifications', onPress: () => router.push('/notifications') },
     { icon: '?', label: 'Help & Support', onPress: () => undefined },
   ];
 

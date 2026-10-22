@@ -285,9 +285,6 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                   <Text variant="subheading" style={styles.sectionTitle}>
                     Property details
                   </Text>
-                  <Text variant="caption" color="textSecondary">
-                    Choose where the tenant will be staying
-                  </Text>
                 </View>
               </View>
               <Text variant="label" style={styles.fieldLabel}>Property *</Text>
@@ -361,9 +358,6 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                   <Text variant="subheading" style={styles.sectionTitle}>
                     Tenant information
                   </Text>
-                  <Text variant="caption" color="textSecondary">
-                    Add the tenant's contact details
-                  </Text>
                 </View>
               </View>
             <Input
@@ -393,9 +387,6 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                 <View style={styles.sectionCopy}>
                   <Text variant="subheading" style={styles.sectionTitle}>
                     Rent schedule
-                  </Text>
-                  <Text variant="caption" color="textSecondary">
-                    Set the rent amount and collection timing
                   </Text>
                 </View>
               </View>

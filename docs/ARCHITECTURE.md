@@ -20,8 +20,8 @@ Factual description of the current code. Rules and workflow are in [AGENTS.md](.
 - Entry: `expo-router/entry` ([package.json](../package.json) `main`).
 - Root layout [app/_layout.tsx](../app/_layout.tsx): `ThemeProvider` > `AuthProvider` > `RootNavigator`.
 - `RootNavigator` renders `GestureHandlerRootView`, `StatusBar` (style from `colorScheme`), a `Stack` (`headerShown: false`, `animation: "none"`; `login` is a `transparentModal`), plus `BottomNav` and `ModeTransitionLoader` conditionally.
-- `BottomNav` is shown when a user is logged in and the path starts with `/tenant`, `/owner`, `/profile` or `/edit-profile`; the active tab is derived from the pathname.
-- Routes: `index` (welcome), `login` (bottom sheet), `otp`, `select-role`, `profile`, `edit-profile`, `tenant`, `tenant/payment`, `tenant/receipts`, `owner`, `owner/properties`, `owner/properties/add` (also edit via params), `owner/properties/[id]`, `owner/tenants`, `owner/bank-accounts`.
+- `BottomNav` is shown when a user is logged in and the path starts with `/tenant`, `/owner`, `/profile`, `/edit-profile` or `/notifications`; the active tab is derived from the pathname.
+- Routes: `index` (welcome), `login` (bottom sheet), `otp`, `select-role`, `profile`, `edit-profile`, `notifications` (placeholder screen opened from Profile), `tenant`, `tenant/payment`, `tenant/receipts`, `owner`, `owner/properties`, `owner/properties/add` (also edit via params), `owner/properties/[id]`, `owner/tenants`, `owner/bank-accounts`.
 - Navigation uses `router.push`/`router.replace` from `expo-router`. React Navigation's theme is **not** wired to the app theme; screens set their own backgrounds.
 
 ## C. Theme architecture
@@ -37,7 +37,7 @@ Files in [theme/](../theme):
 
 Color tokens (both palettes): `primary, primaryForeground, secondary, background, surface, surfaceSecondary, text, textSecondary, secondaryText (deprecated alias), textDisabled, disabled, border, inputBackground, placeholder, success, successForeground, successBackground, warning, error, info, overlay`.
 
-Selection: light and dark are both implemented. `ThemeProvider` follows the OS scheme via `useColorScheme()`. There is no manual override and **no persistence** of a theme preference. The status bar follows `colorScheme`.
+Selection: light and dark are both implemented. `ThemeProvider` follows the OS scheme via `useColorScheme()`. `useTheme()` also returns `toggleColorScheme()`, which flips light/dark and stores the choice as a manual override (`themePreference` in AsyncStorage via `services/storage`). The saved override is loaded on launch and takes priority over the OS scheme; with no saved value the OS scheme is used. All screens and shared components build styles from theme tokens (audited: no hardcoded hex/rgb colors remain in `app/` or `components/`). A toggle made before the saved value loads wins over it. A manual choice is also pushed to `Appearance.setColorScheme` so native chrome (`Alert`, keyboard) matches the in-app theme. The status bar follows `colorScheme`, and the root `Stack` uses `colors.background` as its `contentStyle` (the `login` transparent modal overrides it). The toggle UI is the sun/moon icon on `app/notifications.tsx`.
 
 Usage pattern:
 
@@ -103,7 +103,7 @@ Extend by adding props/variants to the existing component; create a new componen
 
 Confirmed:
 
-- No custom fonts or font loading; no manual theme toggle or persisted preference; navigation theme not synced.
+- No custom fonts or font loading; navigation theme not synced.
 - Legacy theme aliases remain (`colors` export, `secondaryText`, `disabled`, typography aliases). Many screens still use inline font sizes/weights and some hardcoded small paddings/radii.
 - `AppShell.active` unused; `ConfirmDialog` unused and unthemed; `utils/validation.ts` unused; `Button` has no extra variants.
 - Only auth and property endpoints use the real API. Dashboards, receipts, owner tenants and bank accounts are mock/local.
@@ -115,4 +115,4 @@ Confirmed:
 - `README.md` partly describes an older demo user-management app and does not match this architecture.
 - Type check and iOS export passed after the design-system refactor; visuals were not verified on a device.
 
-Recommendations (not implemented): add lint/test tooling, wire React Navigation theme to the app theme, persist a theme preference if wanted, migrate remaining inline typography to `AppText` variants, and remove legacy aliases once unused.
+Recommendations (not implemented): add lint/test tooling, wire React Navigation theme to the app theme, migrate remaining inline typography to `AppText` variants, and remove legacy aliases once unused.
