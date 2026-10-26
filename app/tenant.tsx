@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Screen } from "../components/Screen";
 import { Button } from "../components/Button";
 import { ModeSwitch } from "../components/ModeSwitch";
+import { PendingInvitations } from "../components/PendingInvitations";
 import { rentRepository } from "../services/rentRepository";
 import { createPlatformShadow, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
@@ -17,7 +18,7 @@ export default function Tenant() {
   }, []);
   if (!data) return null;
   return (
-    <Screen style={styles.screen}>
+    <Screen scroll style={styles.screen}>
       <View style={styles.content}>
         <View style={styles.top}>
           <View>
@@ -41,6 +42,7 @@ export default function Tenant() {
             style={styles.pay}
           />
         </View>
+        <PendingInvitations />
         <Text style={styles.section}>Overview</Text>
         <View style={styles.overview}>
           {data.overview.map((x: any) => (
@@ -76,7 +78,7 @@ export default function Tenant() {
 function createStyles({ colors, spacing, radius }: AppTheme) {
   return StyleSheet.create({
   screen: { padding: 0 },
-  content: { flex: 1, padding: spacing.lg },
+  content: { flexGrow: 1, padding: spacing.lg },
   top: {
     flexDirection: "row",
     justifyContent: "space-between",

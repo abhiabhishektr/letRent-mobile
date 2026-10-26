@@ -2,6 +2,7 @@ import React from "react";
 import {
   Alert,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
@@ -14,6 +15,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 import { AppMode } from "../types/user";
+import { PendingInvitations } from "../components/PendingInvitations";
 
 export default function SelectRole() {
   const { mode, switchMode, isModeSwitching } = useAuth();
@@ -41,66 +43,72 @@ export default function SelectRole() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.content}>
-        <View style={styles.intro}>
-          <View style={styles.eyebrow}>
-            <View style={styles.eyebrowDot} />
-            <Text style={styles.eyebrowText}>LETRENT</Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <View>
+          <View style={styles.intro}>
+            <View style={styles.eyebrow}>
+              <View style={styles.eyebrowDot} />
+              <Text style={styles.eyebrowText}>LETRENT</Text>
+            </View>
+            <Text style={styles.title}>What brings you here?</Text>
+            <Text style={styles.subtitle}>Choose your place to get started.</Text>
           </View>
-          <Text style={styles.title}>What brings you here?</Text>
-          <Text style={styles.subtitle}>Choose your place to get started.</Text>
-        </View>
 
-        <View style={styles.options}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isModeSwitching }}
-            disabled={isModeSwitching}
-            onPress={() => chooseMode("tenant")}
-            style={({ pressed }) => [
-              styles.option,
-              pressed && styles.optionPressed,
-              isModeSwitching && styles.optionDisabled,
-            ]}
-          >
-            <View style={[styles.iconWrap, styles.tenantIconWrap]}>
-              <AntDesign name="key" size={23} color={colors.primary} />
-            </View>
-            <View style={styles.optionCopy}>
-              <Text style={styles.optionTitle}>I'm a tenant</Text>
-              <Text style={styles.optionSubtitle}>My home and rent</Text>
-            </View>
-            <AntDesign name="arrow-right" size={20} color={colors.text} />
-          </Pressable>
+          <View style={styles.options}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isModeSwitching }}
+              disabled={isModeSwitching}
+              onPress={() => chooseMode("tenant")}
+              style={({ pressed }) => [
+                styles.option,
+                pressed && styles.optionPressed,
+                isModeSwitching && styles.optionDisabled,
+              ]}
+            >
+              <View style={[styles.iconWrap, styles.tenantIconWrap]}>
+                <AntDesign name="key" size={23} color={colors.primary} />
+              </View>
+              <View style={styles.optionCopy}>
+                <Text style={styles.optionTitle}>I'm a tenant</Text>
+                <Text style={styles.optionSubtitle}>My home and rent</Text>
+              </View>
+              <AntDesign name="arrow-right" size={20} color={colors.text} />
+            </Pressable>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isModeSwitching }}
-            disabled={isModeSwitching}
-            onPress={() => chooseMode("owner")}
-            style={({ pressed }) => [
-              styles.option,
-              pressed && styles.optionPressed,
-              isModeSwitching && styles.optionDisabled,
-            ]}
-          >
-            <View style={[styles.iconWrap, styles.ownerIconWrap]}>
-              <AntDesign name="home" size={23} color={colors.success} />
-            </View>
-            <View style={styles.optionCopy}>
-              <Text style={styles.optionTitle}>I'm an owner</Text>
-              <Text style={styles.optionSubtitle}>My properties and tenants</Text>
-            </View>
-            <AntDesign name="arrow-right" size={20} color={colors.text} />
-          </Pressable>
-        </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isModeSwitching }}
+              disabled={isModeSwitching}
+              onPress={() => chooseMode("owner")}
+              style={({ pressed }) => [
+                styles.option,
+                pressed && styles.optionPressed,
+                isModeSwitching && styles.optionDisabled,
+              ]}
+            >
+              <View style={[styles.iconWrap, styles.ownerIconWrap]}>
+                <AntDesign name="home" size={23} color={colors.success} />
+              </View>
+              <View style={styles.optionCopy}>
+                <Text style={styles.optionTitle}>I'm an owner</Text>
+                <Text style={styles.optionSubtitle}>My properties and tenants</Text>
+              </View>
+              <AntDesign name="arrow-right" size={20} color={colors.text} />
+            </Pressable>
+          </View>
 
-        <View style={styles.bottomMark}>
-          <View style={styles.bottomLine} />
-          <Text style={styles.bottomText}>A better way to rent</Text>
-          <View style={styles.bottomLine} />
+          <View style={styles.bottomMark}>
+            <View style={styles.bottomLine} />
+            <Text style={styles.bottomText}>A better way to rent</Text>
+            <View style={styles.bottomLine} />
+          </View>
         </View>
-      </View>
+        <PendingInvitations
+          compact
+          onViewAll={() => void chooseMode("tenant")}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -112,9 +120,10 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     backgroundColor: colors.background,
   },
   content: {
-    flex: 1,
-    justifyContent: "center",
+    flexGrow: 1,
+    justifyContent: "space-between",
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
   intro: {
     marginBottom: spacing.xl,

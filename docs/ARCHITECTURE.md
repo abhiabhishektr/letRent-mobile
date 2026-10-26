@@ -73,6 +73,7 @@ All in [components/](../components); they read the theme via `useTheme`/`useThem
 - [AnimatedBottomSheet](../components/AnimatedBottomSheet.tsx): `children`, `onClose`, optional animation timings/spring configuration and close accessibility label. Reanimated + gesture-handler, pan-to-close, backdrop. Used by `login` and the owner tenant form.
 - [ModeSwitch](../components/ModeSwitch.tsx): tenant/owner toggle via `useAuth().switchMode`. This switches app role, not appearance.
 - [ModeTransitionLoader](../components/ModeTransitionLoader.tsx): full-screen overlay with pulsing logo while `isModeSwitching`.
+- [PendingInvitations](../components/PendingInvitations.tsx): focus-refreshed invitation preview/list with acceptance confirmation, optional rejection remarks, and themed loading/error/empty states. Used on role selection and the tenant dashboard.
 
 Extend by adding props/variants to the existing component; create a new component only when no existing one covers the need.
 
@@ -84,6 +85,7 @@ Extend by adding props/variants to the existing component; create a new componen
   - `switchMode` runs `withMinimumDuration(..., 2000)` then routes to `/tenant` or `/owner`. `logout` clears session and tokens and routes to `/`. `updateProfile` is local only.
 - [services/api.ts](../services/api.ts): `API_BASE_URL` (env `EXPO_PUBLIC_API_BASE_URL`, then `expo-constants` `extra.apiBaseUrl`, then a built-in default), `apiClient` (axios, 20s timeout), `getErrorMessage`. No interceptors and no token refresh; auth headers are set per call.
 - [services/authApi.ts](../services/authApi.ts): `authApi.googleLogin`, `sendOtp`, `verifyOtp`, `resendOtp` (`/api/auth/...`; OTP calls send multipart form data).
+- [services/tenancyApi.ts](../services/tenancyApi.ts): creates owner-side tenant invitations and fetches/accepts/rejects tenant invitations using the shared API client and access token. Pending-list pagination follows same-origin backend links.
 - [services/propertyApi.ts](../services/propertyApi.ts): `lookupPinCode` (external postal-pincode API), `getProperties`, `getProperty`, `createProperty`, `updateProperty`, `deleteProperty`, plus input/response types. Reads the Bearer token from `tokenStorage`; throws if absent.
 - [services/tokenStorage.ts](../services/tokenStorage.ts): `setTokens`, `getAccessToken`, `getRefreshToken`, `clearTokens` (SecureStore).
 - [services/storage.ts](../services/storage.ts): JSON AsyncStorage wrapper (`get`, `set`, `remove`).
@@ -106,7 +108,7 @@ Confirmed:
 - No custom fonts or font loading; navigation theme not synced.
 - Legacy theme aliases remain (`colors` export, `secondaryText`, `disabled`, typography aliases). Many screens still use inline font sizes/weights and some hardcoded small paddings/radii.
 - `AppShell.active` unused; `ConfirmDialog` unused and unthemed; `utils/validation.ts` unused; `Button` has no extra variants.
-- Only auth and property endpoints use the real API. Dashboards, receipts, owner tenants and bank accounts are mock/local.
+- Auth, property and tenant-invitation endpoints use the real API. Dashboards, receipts, owner tenants and bank accounts are mock/local; accepting an invitation does not update a separate active-tenancy client state because none exists yet.
 - The owner tenant add form uses local demo properties, validates tenant and rent details, and stores its collection date as `YYYY-MM-DD`; new tenants are not persisted across app restarts.
 - No token refresh logic. `getProperty` requests `/api/properties/${id}` without a trailing slash, unlike the other property calls.
 - `verifyOtp` in `AuthContext` falls back to a demo user when the API fails and the OTP is `1234`; the OTP UI is 6 digits, so it is likely unreachable. Security-sensitive; investigate before touching.
