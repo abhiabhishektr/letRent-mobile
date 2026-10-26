@@ -25,6 +25,11 @@ export function AppText({
   ...props
 }: Props) {
   const { colors, typography } = useTheme();
+  const resolveColor = (value?: string) => {
+    if (!value) return colors.text;
+    const token = (colors as Record<string, unknown>)[value];
+    return typeof token === "string" ? token : value;
+  };
   return (
     <Text
       {...props}
@@ -32,7 +37,7 @@ export function AppText({
         variant ? typography[variant] : undefined,
         {
           fontFamily: typography.body.fontFamily,
-          color: color ?? colors.text,
+          color: resolveColor(color),
         },
         style,
       ]}
