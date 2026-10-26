@@ -14,7 +14,7 @@ const store = {
     if (Platform.OS === "web") {
       return globalThis.localStorage?.getItem(key) ?? null;
     }
-    return store.get(key);
+    return SecureStore.getItemAsync(key);
   },
   async remove(key: string): Promise<void> {
     if (Platform.OS === "web") {

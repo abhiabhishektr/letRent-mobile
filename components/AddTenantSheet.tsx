@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -15,8 +15,9 @@ import { AnimatedBottomSheet } from "./AnimatedBottomSheet";
 import { AppText as Text } from "./AppText";
 import { Button } from "./Button";
 import { Input } from "./Input";
+import { getProperties } from "../services/propertyApi";
+import { createTenantInvitation, type TenancyFrequency } from "../services/tenancyApi";
 import {
-  DEMO_PROPERTIES,
   rentRepository,
   type OwnerTenant,
   type PaymentFrequency,
@@ -78,10 +79,10 @@ function formatDate(value: string) {
 }
 
 function validateMobileNumber(value: string) {
-  const compact = value.trim().replace(/[\s-]/g, "");
-  return /^(?:\+?91)?[6-9]\d{9}$/.test(compact)
-    ? compact.slice(-10)
-    : null;
+  let digits = value.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
+  else if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
+  return /^[6-9]\d{9}$/.test(digits) ? digits : null;
 }
 
 export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
@@ -93,23 +94,55 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => new Date());
   const [submitting, setSubmitting] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const [propertiesError, setPropertiesError] = useState<string | null>(null);
   const submittingRef = useRef(false);
   const closeSheetRef = useRef(onClose);
   const successNameRef = useRef<string | null>(null);
+  const [successName, setSuccessName] = useState<string | null>(null);
   closeSheetRef.current = onClose;
 
   const handleSheetClose = () => {
     onClose();
     if (successNameRef.current) {
-      Alert.alert(
-        "Tenant added",
-        `${successNameRef.current} has been added successfully.`,
-      );
+      setSuccessName(successNameRef.current);
       successNameRef.current = null;
     }
   };
 
-  const selectedProperty = DEMO_PROPERTIES.find(
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    setPropertiesLoading(true);
+    setPropertiesError(null);
+    getProperties()
+      .then((list) => {
+        if (cancelled) return;
+        setProperties(
+          list.map((item) => ({
+            id: String(item.id),
+            name: item.name,
+            address: [item.address, item.city].filter(Boolean).join(", "),
+            units: "",
+            occupied: "",
+          })),
+        );
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setProperties([]);
+        setPropertiesError("Error fetching properties. Please try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setPropertiesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [visible]);
+
+  const selectedProperty = properties.find(
     (property) => property.id === values.propertyId,
   );
   const calendarDays = useMemo(() => {
@@ -157,7 +190,7 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
     if (!selectedProperty) nextErrors.propertyId = "Choose a property.";
     if (!values.tenant.trim()) nextErrors.tenant = "Enter the tenant name.";
     if (!validateMobileNumber(values.mobileNumber)) {
-      nextErrors.mobileNumber = "Enter a valid 10-digit Indian mobile number.";
+      nextErrors.mobileNumber = "Enter a valid 10-digit mobile number starting with 6-9.";
     }
     if (values.amount.trim() === "") {
       nextErrors.amount = "Enter the rent amount.";
@@ -186,6 +219,16 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
     submittingRef.current = true;
     setSubmitting(true);
     try {
+      await createTenantInvitation({
+        property_id: Number(selectedProperty.id),
+        mobile_number: `+91${mobileNumber}`,
+        name: values.tenant.trim(),
+        room_number: values.unit.trim() || undefined,
+        rent_amount: Number(values.amount).toFixed(2),
+        frequency: values.paymentFrequency.toUpperCase() as TenancyFrequency,
+        first_due_date: values.collectionDate,
+        send_sms: false,
+      });
       const tenant = await rentRepository.addOwnerTenant({
         propertyId: selectedProperty.id,
         property: selectedProperty.name,
@@ -227,9 +270,40 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
     setCalendarVisible(false);
   };
 
-  if (!visible) return null;
+  const successModal = (
+    <Modal
+      transparent
+      animationType="fade"
+      visible={successName !== null}
+      onRequestClose={() => setSuccessName(null)}
+      statusBarTranslucent
+    >
+      <View style={styles.successBackdrop}>
+        <View style={styles.successCard}>
+          <View style={styles.successTick}>
+            <Text style={styles.successTickText}>✓</Text>
+          </View>
+          <Text variant="heading" style={styles.title}>
+            Invite sent
+          </Text>
+          <Text style={styles.successMessage}>
+            {successName} has been invited to join LetRent.
+          </Text>
+          <Button
+            title="Done"
+            onPress={() => setSuccessName(null)}
+            style={styles.successButton}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+
+  if (!visible) return successName !== null ? successModal : null;
 
   return (
+    <>
+    {successModal}
     <Modal
       transparent
       animationType="none"
@@ -307,7 +381,20 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
             ) : null}
             {propertyPickerVisible ? (
               <View style={styles.options}>
-                {DEMO_PROPERTIES.map((property) => (
+                {propertiesLoading ? (
+                  <View style={styles.option}>
+                    <Text color="textSecondary">Loading properties...</Text>
+                  </View>
+                ) : propertiesError ? (
+                  <View style={styles.option}>
+                    <Text color="error">{propertiesError}</Text>
+                  </View>
+                ) : properties.length === 0 ? (
+                  <View style={styles.option}>
+                    <Text color="textSecondary">0 properties</Text>
+                  </View>
+                ) : null}
+                {properties.map((property) => (
                   <Pressable
                     key={property.id}
                     accessibilityRole="button"
@@ -563,11 +650,44 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
         }}
       </AnimatedBottomSheet>
     </Modal>
+    </>
   );
 }
 
 function createStyles({ colors, spacing, radius }: AppTheme) {
   return StyleSheet.create({
+    successBackdrop: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: spacing.lg,
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    successCard: {
+      width: "100%",
+      maxWidth: 340,
+      alignItems: "center",
+      gap: spacing.sm,
+      padding: spacing.lg,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+    },
+    successTick: {
+      width: 64,
+      height: 64,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: radius.pill,
+      backgroundColor: colors.success,
+    },
+    successTickText: {
+      color: colors.successForeground,
+      fontSize: 34,
+      lineHeight: 40,
+      fontWeight: "800",
+    },
+    successMessage: { color: colors.textSecondary, textAlign: "center" },
+    successButton: { alignSelf: "stretch", marginTop: spacing.sm },
     form: { flex: 1 },
     header: {
       flexDirection: "row",

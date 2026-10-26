@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Pressable,
   ScrollView,
   StyleSheet,
   View,
@@ -17,7 +16,7 @@ import {
   type OwnerTenant,
   type TenantQuery,
 } from "../../services/rentRepository";
-import { useThemedStyles } from "../../theme";
+import { createPlatformShadow, useThemedStyles } from "../../theme";
 import type { AppTheme } from "../../theme";
 
 const FILTERS: FilterGroup[] = [
@@ -83,22 +82,13 @@ export default function Tenants() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Go back"
-        onPress={() => router.back()}
-        style={styles.backButton}
-      >
-        <Text style={styles.back}>‹</Text>
-      </Pressable>
-      <View style={styles.titleRow}>
-        <View style={styles.titleContainer}>
-          <Text variant="heading" style={styles.title}>Tenants</Text>
-          <Text variant="bodySmall" color="textSecondary">
-            {tenants.length} matching tenant{tenants.length === 1 ? "" : "s"}
-          </Text>
-        </View>
+      <View style={styles.headerRow}>
+        <Text onPress={() => router.back()} style={styles.back}>‹</Text>
+        <Text style={styles.title}>Tenants</Text>
       </View>
+      <Text style={styles.sub}>
+        {tenants.length} matching tenant{tenants.length === 1 ? "" : "s"}
+      </Text>
 
       <SearchFilterBar
         query={search}
@@ -182,25 +172,21 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     screenContent: { flex: 1, padding: 0 },
     listScroll: { flex: 1 },
     content: { padding: spacing.lg, paddingBottom: spacing.xxl + 56 },
-    backButton: { alignSelf: "flex-start", paddingRight: spacing.md },
-    back: { fontSize: 36, lineHeight: 35, color: colors.text },
-    titleRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: spacing.sm,
-      marginTop: spacing.sm,
-      marginBottom: spacing.lg,
-    },
-    titleContainer: { flex: 1, gap: spacing.xs },
-    title: { color: colors.text },
+    headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    back: { fontSize: 36, lineHeight: 35, marginRight: spacing.md, color: colors.text },
+    title: { fontSize: 24, fontWeight: "800", marginTop: spacing.sm, flex: 1, color: colors.text },
+    sub: { color: colors.textSecondary, fontSize: 13, marginTop: 4, marginBottom: spacing.lg },
     row: {
       flexDirection: "row",
       alignItems: "center",
-      gap: spacing.sm,
-      borderBottomWidth: 1,
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
       borderColor: colors.border,
-      paddingVertical: spacing.md,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      ...createPlatformShadow({ color: colors.text, opacity: 0.06, radius: 8, elevation: 2 }),
     },
     avatar: {
       width: 40,

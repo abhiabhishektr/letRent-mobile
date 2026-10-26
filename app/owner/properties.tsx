@@ -96,7 +96,7 @@ export default function Properties() {
       <Text onPress={() => router.back()} style={styles.back}>‹</Text>
       <Text style={styles.title}>Properties</Text>
     </View>
-    <Text style={styles.sub}>12 properties · 24 units</Text>
+    <Text style={styles.sub}>{filteredProperties.length} propert{filteredProperties.length === 1 ? 'y' : 'ies'}</Text>
     <SearchFilterBar query={search} onQueryChange={setSearch} placeholder="Search properties or location" />
     {filteredProperties.map((property) => <View key={property.id} style={styles.card}>
       <Pressable onPress={() => handleView(property)} style={styles.cardBody}>
