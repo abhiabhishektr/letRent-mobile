@@ -2,20 +2,30 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "expo-router";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { AppText } from "./AppText";
 import { useTheme } from "../theme";
-const tenant = [
-  ["⌂", "Home", "/tenant"],
-  ["▣", "Payment", "/tenant/payment"],
-  ["▤", "History", "/tenant/receipts"],
-  ["•••", "More", "/profile"],
+
+type BottomNavItem = {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  path: string;
+};
+
+const tenant: BottomNavItem[] = [
+  { icon: "home-outline", label: "Home", path: "/tenant" },
+  { icon: "card-outline", label: "Payment", path: "/tenant/payment" },
+  { icon: "receipt-outline", label: "History", path: "/tenant/receipts" },
+  { icon: "ellipsis-horizontal-circle-outline", label: "More", path: "/profile" },
 ];
-const owner = [
-  ["⌂", "Home", "/owner"],
-  ["▥", "Properties", "/owner/properties"],
-  ["♙", "Tenants", "/owner/tenants"],
-  ["•••", "More", "/profile"],
+
+const owner: BottomNavItem[] = [
+  { icon: "home-outline", label: "Home", path: "/owner" },
+  { icon: "business-outline", label: "Properties", path: "/owner/properties" },
+  { icon: "people-outline", label: "Tenants", path: "/owner/tenants" },
+  { icon: "ellipsis-horizontal-circle-outline", label: "More", path: "/profile" },
 ];
+
 export function BottomNav({
   mode,
   active,
@@ -45,7 +55,6 @@ export function BottomNav({
           minHeight: 48,
           gap: spacing.xs,
         },
-        icon: { fontSize: 19, color: colors.textSecondary },
         label: {
           ...typography.caption,
           fontSize: 10,
@@ -58,7 +67,7 @@ export function BottomNav({
 
   useEffect(() => {
     Animated.parallel(
-      items.map(([, label], index) =>
+      items.map(({ label }, index) =>
         Animated.spring(animations[index], {
           toValue: active === label ? 1 : 0,
           useNativeDriver: true,
@@ -71,7 +80,7 @@ export function BottomNav({
 
   return (
     <View style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      {items.map(([icon, label, path], index) => (
+      {items.map(({ icon, label, path }, index) => (
         <Pressable
           key={label}
           accessibilityRole="button"
@@ -92,9 +101,11 @@ export function BottomNav({
               transform: [{ scale: animations[index].interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.08] }) }],
             }}
           >
-            <AppText style={[styles.icon, active === label && styles.selected]}>
-              {icon}
-            </AppText>
+            <Ionicons
+              name={icon}
+              size={22}
+              color={active === label ? colors.primary : colors.textSecondary}
+            />
             <AppText style={[styles.label, active === label && styles.selected]}>
               {label}
             </AppText>

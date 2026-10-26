@@ -69,6 +69,11 @@ function dateKey(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function startOfToday() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
 function formatDate(value: string) {
   const [year, month, day] = value.split("-").map(Number);
   return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
@@ -167,6 +172,7 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
         return {
           day,
           key: dateKey(date),
+          isPast: date < startOfToday(),
           label: date.toLocaleDateString("en-IN", {
             day: "numeric",
             month: "long",
@@ -206,6 +212,8 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
     }
     if (!values.collectionDate) {
       nextErrors.collectionDate = "Choose a collection date.";
+    } else if (values.collectionDate < dateKey(startOfToday())) {
+      nextErrors.collectionDate = "Collection date cannot be in the past.";
     }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -262,13 +270,43 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
     setPropertyPickerVisible(false);
   };
 
-  const selectDate = (day: number) => {
-    updateValue(
-      "collectionDate",
-      dateKey(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day)),
-    );
+  const selectDate = (key: string, isPast: boolean) => {
+    if (isPast) {
+      setValues((current) => ({ ...current, collectionDate: "" }));
+      setErrors((current) => ({
+        ...current,
+        collectionDate: "Collection date cannot be in the past. Choose today or a later date.",
+      }));
+      return;
+    }
+    updateValue("collectionDate", key);
     setCalendarVisible(false);
   };
+
+  const quickDates = useMemo(() => {
+    const today = startOfToday();
+    return [
+      { label: "Today", date: today },
+      {
+        label: "Tomorrow",
+        date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+      },
+      {
+        label: "Next month start",
+        date: new Date(today.getFullYear(), today.getMonth() + 1, 1),
+      },
+    ];
+  }, [visible]);
+
+  const selectQuickDate = (date: Date) => {
+    updateValue("collectionDate", dateKey(date));
+    setVisibleMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+    setCalendarVisible(false);
+  };
+
+  const isCurrentMonthVisible =
+    visibleMonth.getFullYear() === startOfToday().getFullYear() &&
+    visibleMonth.getMonth() === startOfToday().getMonth();
 
   const successModal = (
     <Modal
@@ -539,6 +577,28 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
               </Text>
               <Text color="textSecondary">▦</Text>
             </Pressable>
+            <View style={styles.quickRow}>
+              {quickDates.map((option) => {
+                const active = values.collectionDate === dateKey(option.date);
+                return (
+                  <Pressable
+                    key={option.label}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Set collection date to ${option.label}`}
+                    accessibilityState={{ selected: active }}
+                    onPress={() => selectQuickDate(option.date)}
+                    style={[styles.quickChip, active && styles.quickChipActive]}
+                  >
+                    <Text
+                      variant="caption"
+                      style={active ? styles.selectedDayText : undefined}
+                    >
+                      {option.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
             {errors.collectionDate ? (
               <Text variant="caption" color="error" style={styles.errorText}>
                 {errors.collectionDate}
@@ -550,13 +610,14 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Previous month"
+                    disabled={isCurrentMonthVisible}
                     onPress={() =>
                       setVisibleMonth(
                         (month) =>
                           new Date(month.getFullYear(), month.getMonth() - 1, 1),
                       )
                     }
-                    style={styles.monthButton}
+                    style={[styles.monthButton, isCurrentMonthVisible && styles.pastDay]}
                   >
                     <Text>‹</Text>
                   </Pressable>
@@ -605,11 +666,12 @@ export function AddTenantSheet({ visible, onClose, onAdded }: Props) {
                         accessibilityState={{
                           selected: values.collectionDate === cell.key,
                         }}
-                        onPress={() => selectDate(cell.day)}
+                        onPress={() => selectDate(cell.key, cell.isPast)}
                         style={[
                           styles.calendarCell,
                           values.collectionDate === cell.key &&
                             styles.selectedDay,
+                          cell.isPast && styles.pastDay,
                         ]}
                       >
                         <Text
@@ -832,6 +894,22 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
       alignItems: "center",
       justifyContent: "center",
     },
+    pastDay: { opacity: 0.3 },
+    quickRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    quickChip: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + 2,
+    },
+    quickChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
     selectedDay: { borderRadius: radius.pill, backgroundColor: colors.primary },
     selectedDayText: { color: colors.primaryForeground, fontWeight: "700" },
     actions: {
