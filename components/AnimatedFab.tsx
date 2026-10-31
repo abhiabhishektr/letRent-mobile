@@ -13,7 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { AppText } from "./AppText";
-import { useThemedStyles } from "../theme";
+import { createPlatformShadow, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 
 type Props = {
@@ -91,11 +91,13 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
       borderRadius: radius.pill,
       backgroundColor: colors.primary,
       overflow: "hidden",
-      elevation: 5,
-      shadowColor: colors.text,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.22,
-      shadowRadius: 5,
+      ...createPlatformShadow({
+        color: colors.text,
+        opacity: 0.22,
+        radius: 5,
+        offset: { width: 0, height: 3 },
+        elevation: 5,
+      }),
     },
     pressable: {
       width: EXPANDED_WIDTH,

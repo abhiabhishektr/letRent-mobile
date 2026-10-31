@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AppText } from "./AppText";
 import { useTheme } from "../theme";
+import { USE_NATIVE_DRIVER } from "../utils/nativeDriver";
 
 type BottomNavItem = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -70,7 +71,7 @@ export function BottomNav({
       items.map(({ label }, index) =>
         Animated.spring(animations[index], {
           toValue: active === label ? 1 : 0,
-          useNativeDriver: true,
+          useNativeDriver: USE_NATIVE_DRIVER,
           speed: 18,
           bounciness: 6,
         }),

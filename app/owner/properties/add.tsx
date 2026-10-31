@@ -18,6 +18,7 @@ import {
   useThemedStyles,
 } from "../../../theme";
 import type { AppTheme } from "../../../theme";
+import { USE_NATIVE_DRIVER } from "../../../utils/nativeDriver";
 import {
   createProperty,
   lookupPinCode,
@@ -112,14 +113,14 @@ export default function AddPropertyDetails() {
     Animated.parallel([
       Animated.spring(checkScale, {
         toValue: 1,
-        useNativeDriver: true,
+        useNativeDriver: USE_NATIVE_DRIVER,
         bounciness: 8,
         speed: 18,
       }),
       Animated.timing(checkOpacity, {
         toValue: 1,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: USE_NATIVE_DRIVER,
       }),
     ]).start();
 

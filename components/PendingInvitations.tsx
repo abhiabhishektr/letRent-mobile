@@ -2,11 +2,15 @@ import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
 import { useFocusEffect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText } from "./AppText";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -16,6 +20,7 @@ import {
   rejectTenantInvitation,
 } from "../services/tenancyApi";
 import type { PendingTenantInvitation } from "../services/tenancyApi";
+import { useAuth } from "../context/AuthContext";
 import { useTheme, useThemedStyles } from "../theme";
 import type { AppTheme } from "../theme";
 
@@ -23,6 +28,10 @@ type Props = {
   compact?: boolean;
   onViewAll?: () => void;
 };
+
+function normalizePhone(value: string): string {
+  return value.replace(/\D/g, "").slice(-10);
+}
 
 function formatCurrency(amount: string): string {
   const value = Number(amount);
@@ -153,6 +162,7 @@ function PendingInvitationCard({
 export function PendingInvitations({ compact = false, onViewAll }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
+  const { currentUser } = useAuth();
   const [invitations, setInvitations] = useState<PendingTenantInvitation[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -165,6 +175,8 @@ export function PendingInvitations({ compact = false, onViewAll }: Props) {
   const isFocused = useRef(false);
   const submissionLock = useRef<number | null>(null);
 
+  const recipientPhone = normalizePhone(currentUser?.phone ?? "");
+
   const refresh = useCallback(async (excludedIds: number[] = []) => {
     const version = ++requestVersion.current;
     setLoading(true);
@@ -174,8 +186,14 @@ export function PendingInvitations({ compact = false, onViewAll }: Props) {
       const response = await getPendingTenantInvitations();
       if (version !== requestVersion.current || !isFocused.current) return;
       const excluded = new Set(excludedIds);
-      setInvitations(response.results.filter(({ id }) => !excluded.has(id)));
-      setCount(Math.max(0, response.count - excluded.size));
+      const visibleInvitations = response.results.filter(
+        (invitation) =>
+          !excluded.has(invitation.id) &&
+          recipientPhone.length === 10 &&
+          normalizePhone(invitation.mobile_number) === recipientPhone,
+      );
+      setInvitations(visibleInvitations);
+      setCount(visibleInvitations.length);
     } catch (fetchError) {
       if (version !== requestVersion.current || !isFocused.current) return;
       setError(
@@ -188,7 +206,7 @@ export function PendingInvitations({ compact = false, onViewAll }: Props) {
         setLoading(false);
       }
     }
-  }, []);
+  }, [recipientPhone]);
 
   useFocusEffect(
     useCallback(() => {
@@ -375,40 +393,50 @@ export function PendingInvitations({ compact = false, onViewAll }: Props) {
           if (submittingId === null) setRejectingInvitation(null);
         }}
       >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <AppText variant="subheading">Reject invitation?</AppText>
-            <AppText variant="bodySmall" color="textSecondary" style={styles.modalDescription}>
-              You can optionally tell the owner why you are declining.
-            </AppText>
-            <Input
-              label="Reason (optional)"
-              value={rejectReason}
-              onChangeText={setRejectReason}
-              multiline
-              maxLength={500}
-              style={styles.reasonInput}
-              editable={submittingId === null}
-            />
-            <View style={styles.actions}>
-              <Button
-                title="Cancel"
-                onPress={() => setRejectingInvitation(null)}
-                outline
-                disabled={submittingId !== null}
-                style={styles.actionButton}
-              />
-              <Button
-                title="Reject Invitation"
-                onPress={() => void submitReject()}
-                danger
-                loading={submittingId === rejectingInvitation?.id}
-                disabled={submittingId !== null}
-                style={styles.actionButton}
-              />
-            </View>
-          </View>
-        </View>
+        <SafeAreaView style={styles.modalSafeArea}>
+          <KeyboardAvoidingView
+            style={styles.modalKeyboard}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+          >
+            <ScrollView
+              contentContainerStyle={styles.modalBackdrop}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.modalCard}>
+                <AppText variant="subheading">Reject invitation?</AppText>
+                <AppText variant="bodySmall" color="textSecondary" style={styles.modalDescription}>
+                  You can optionally tell the owner why you are declining.
+                </AppText>
+                <Input
+                  label="Reason (optional)"
+                  value={rejectReason}
+                  onChangeText={setRejectReason}
+                  multiline
+                  maxLength={500}
+                  style={styles.reasonInput}
+                  editable={submittingId === null}
+                />
+                <View style={styles.actions}>
+                  <Button
+                    title="Cancel"
+                    onPress={() => setRejectingInvitation(null)}
+                    outline
+                    disabled={submittingId !== null}
+                    style={styles.actionButton}
+                  />
+                  <Button
+                    title="Reject Invitation"
+                    onPress={() => void submitReject()}
+                    danger
+                    loading={submittingId === rejectingInvitation?.id}
+                    disabled={submittingId !== null}
+                    style={styles.actionButton}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
     </View>
   );
@@ -506,8 +534,15 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
+      flexGrow: 1,
       padding: spacing.lg,
       backgroundColor: colors.overlay,
+    },
+    modalSafeArea: {
+      flex: 1,
+    },
+    modalKeyboard: {
+      flex: 1,
     },
     modalCard: {
       width: "100%",

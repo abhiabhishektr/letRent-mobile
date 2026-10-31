@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, Animated, Image, StyleSheet, View } from 'react-native';
 import { AppText } from './AppText';
 import { useTheme } from '../theme';
+import { USE_NATIVE_DRIVER } from '../utils/nativeDriver';
 
 export function ModeTransitionLoader() {
   const { colors, typography, spacing } = useTheme();
@@ -15,7 +16,7 @@ export function ModeTransitionLoader() {
   }), [colors, spacing, typography]);
   const pulse = useRef(new Animated.Value(0.96)).current;
   useEffect(() => {
-    const animation = Animated.loop(Animated.sequence([Animated.timing(pulse, { toValue: 1.04, duration: 700, useNativeDriver: true }), Animated.timing(pulse, { toValue: 0.96, duration: 700, useNativeDriver: true })]));
+    const animation = Animated.loop(Animated.sequence([Animated.timing(pulse, { toValue: 1.04, duration: 700, useNativeDriver: USE_NATIVE_DRIVER }), Animated.timing(pulse, { toValue: 0.96, duration: 700, useNativeDriver: USE_NATIVE_DRIVER })]));
     animation.start();
     return () => animation.stop();
   }, [pulse]);

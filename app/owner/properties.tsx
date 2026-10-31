@@ -14,6 +14,7 @@ import { AnimatedFab } from '../../components/AnimatedFab';
 import { AppShell } from '../../components/AppShell';
 import { SearchFilterBar } from '../../components/SearchFilterBar';
 import { createPlatformShadow, useThemedStyles } from '../../theme';
+import { USE_NATIVE_DRIVER } from '../../utils/nativeDriver';
 import type { AppTheme } from '../../theme';
 import { getProperties, PROPERTY_TYPE_OPTIONS, PropertyResponse } from '../../services/propertyApi';
 
@@ -49,13 +50,13 @@ export default function Properties() {
         Animated.timing(backdropOpacity, {
           toValue: 1,
           duration: 220,
-          useNativeDriver: true,
+          useNativeDriver: USE_NATIVE_DRIVER,
         }),
         Animated.spring(sheetTranslate, {
           toValue: 0,
           speed: 18,
           bounciness: 8,
-          useNativeDriver: true,
+          useNativeDriver: USE_NATIVE_DRIVER,
         }),
       ]).start();
     } else {
@@ -63,13 +64,13 @@ export default function Properties() {
         Animated.timing(backdropOpacity, {
           toValue: 0,
           duration: 180,
-          useNativeDriver: true,
+          useNativeDriver: USE_NATIVE_DRIVER,
         }),
         Animated.spring(sheetTranslate, {
           toValue: 260,
           speed: 18,
           bounciness: 8,
-          useNativeDriver: true,
+          useNativeDriver: USE_NATIVE_DRIVER,
         }),
       ]).start();
     }
