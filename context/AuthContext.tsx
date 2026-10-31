@@ -68,7 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setPendingPhone(normalizedPhone);
     await authApi.sendOtp(normalizedPhone);
-    router.push("/otp");
+    // Replace the login modal so the OTP card is not pushed behind it.
+    router.replace("/otp");
   };
 
   const loginWithGoogle = async (

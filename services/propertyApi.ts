@@ -113,7 +113,7 @@ export async function getProperty(id: number | string): Promise<PropertyResponse
   }
 
   try {
-    const response = await apiClient.get(`/api/properties/${id}`, {
+    const response = await apiClient.get(`/api/properties/${id}/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

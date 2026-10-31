@@ -31,7 +31,7 @@ function RootNavigator() {
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <View style={styles.stack}>
           <Stack
-            screenOptions={{ headerShown: false, animation: "none", contentStyle: { backgroundColor: colors.background } }}
+            screenOptions={{ headerShown: false, presentation: "card", animation: "none", contentStyle: { backgroundColor: colors.background } }}
           >
             <Stack.Screen
               name="login"

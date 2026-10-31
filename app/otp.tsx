@@ -122,7 +122,7 @@ export default function Otp() {
         >
           <View style={styles.topSection}>
             <Pressable
-              onPress={() => router.back()}
+              onPress={() => router.replace("/login")}
               style={({ pressed }) => [
                 styles.backButton,
                 pressed && styles.backButtonPressed,
