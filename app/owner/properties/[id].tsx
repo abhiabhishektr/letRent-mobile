@@ -21,6 +21,7 @@ import {
   PropertyResponse,
   PROPERTY_TYPE_LABELS,
 } from "../../../services/propertyApi";
+import { getLandlordTenancies, type Tenancy } from "../../../services/tenancyApi";
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
@@ -31,6 +32,9 @@ export default function PropertyDetailScreen() {
   const [property, setProperty] = useState<PropertyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tenants, setTenants] = useState<Tenancy[]>([]);
+  const [tenantsLoading, setTenantsLoading] = useState(true);
+  const [tenantsError, setTenantsError] = useState("");
 
   useEffect(() => {
     if (!propertyId) {
@@ -52,6 +56,21 @@ export default function PropertyDetailScreen() {
     };
 
     loadProperty();
+  }, [propertyId]);
+
+  useEffect(() => {
+    if (!propertyId) {
+      setTenantsLoading(false);
+      return;
+    }
+    setTenantsLoading(true);
+    setTenantsError("");
+    getLandlordTenancies({ propertyId, status: "ACTIVE" })
+      .then(setTenants)
+      .catch((error) =>
+        setTenantsError(error instanceof Error ? error.message : "Unable to load tenants."),
+      )
+      .finally(() => setTenantsLoading(false));
   }, [propertyId]);
 
   const handleEdit = () => {
@@ -150,6 +169,37 @@ export default function PropertyDetailScreen() {
         <InfoCard label="PIN code" value={property.pincode} />
         <InfoCard label="Status" value={property.is_active === false ? "Inactive" : "Active"} />
       </View>
+
+      <Text style={styles.sectionTitle}>Tenants</Text>
+      {tenantsLoading ? <ActivityIndicator color={colors.primary} size="small" /> : null}
+      {tenantsError ? <Text style={styles.sectionNote}>{tenantsError}</Text> : null}
+      {!tenantsLoading && !tenantsError && !tenants.length ? (
+        <Text style={styles.sectionNote}>No active tenants in this property.</Text>
+      ) : null}
+      {tenants.map((tenant) => (
+        <Pressable
+          key={tenant.id}
+          style={styles.tenantRow}
+          onPress={() =>
+            router.push({
+              pathname: "/owner/tenants/[id]",
+              params: { id: String(tenant.id) },
+            })
+          }
+        >
+          <View style={styles.tenantInfo}>
+            <Text style={styles.tenantName}>{tenant.tenant_name}</Text>
+            <Text style={styles.sectionNote}>
+              {[tenant.room_number, tenant.tenant_mobile_number].filter(Boolean).join(" · ")}
+            </Text>
+          </View>
+          {tenant.current_rent_schedule ? (
+            <Text style={styles.tenantRent}>
+              ₹{Number(tenant.current_rent_schedule.rent_amount).toLocaleString("en-IN")}
+            </Text>
+          ) : null}
+        </Pressable>
+      ))}
     </Screen>
   );
 }
@@ -257,6 +307,21 @@ function createStyles({ colors, spacing, radius }: AppTheme) {
     borderColor: colors.border,
     padding: spacing.md,
   },
+  sectionTitle: { fontSize: 18, fontWeight: "800", color: colors.text, marginTop: spacing.xl, marginBottom: spacing.sm },
+  sectionNote: { fontSize: 13, color: colors.textSecondary },
+  tenantRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  tenantInfo: { flex: 1, gap: spacing.xs },
+  tenantName: { fontSize: 16, fontWeight: "700", color: colors.text },
+  tenantRent: { fontSize: 15, fontWeight: "700", color: colors.text },
   infoLabel: { fontSize: 12, color: colors.textSecondary, marginBottom: spacing.xs },
   infoValue: { fontSize: 16, fontWeight: "700", color: colors.text },
 });

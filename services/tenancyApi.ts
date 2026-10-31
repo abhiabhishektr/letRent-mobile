@@ -169,3 +169,87 @@ export async function createTenantInvitation(
     throw new Error(getErrorMessage(error, "Unable to add tenant."));
   }
 }
+
+export type TenancyStatus = "ACTIVE" | "ENDED" | string;
+
+export type RentSchedule = {
+  id: number;
+  rent_amount: string;
+  frequency: TenancyFrequency | string;
+  first_due_date: string;
+  timezone_name: string;
+  remarks: string;
+  effective_from: string;
+  effective_until: string | null;
+  is_current: boolean;
+};
+
+export type Tenancy = {
+  id: number;
+  property_id: number;
+  property_name: string;
+  property_city: string;
+  tenant_id: number;
+  tenant_name: string;
+  tenant_mobile_number: string;
+  room_number: string;
+  status: TenancyStatus;
+  accepted_at: string | null;
+  ended_at: string | null;
+  current_rent_schedule: RentSchedule | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type TenancyPage = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Tenancy[];
+};
+
+export type LandlordTenancyQuery = {
+  propertyId?: number | string;
+  status?: TenancyStatus;
+};
+
+async function authConfig() {
+  const accessToken = await tokenStorage.getAccessToken();
+  if (!accessToken) {
+    throw new Error("Authentication required. Please log in again.");
+  }
+  return { headers: { Authorization: `Bearer ${accessToken}` } };
+}
+
+export async function getLandlordTenancies(
+  query: LandlordTenancyQuery = {},
+): Promise<Tenancy[]> {
+  const config = await authConfig();
+  const params: Record<string, string> = { role: "landlord" };
+  if (query.propertyId !== undefined) params.property_id = String(query.propertyId);
+  if (query.status) params.status = query.status;
+
+  try {
+    const response = await apiClient.get<TenancyPage>("/api/tenancies/", {
+      ...config,
+      params,
+    });
+    const page = response.data;
+    if (!page || !Array.isArray(page.results)) {
+      throw new Error("The tenancy service returned an invalid response.");
+    }
+    return page.results;
+  } catch (error) {
+    throw new Error(getErrorMessage(error, "Unable to load tenants."));
+  }
+}
+
+export async function getTenancy(id: number | string): Promise<Tenancy> {
+  const config = await authConfig();
+  try {
+    const response = await apiClient.get<Tenancy>(`/api/tenancies/${id}/`, config);
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error, "Unable to load tenant details."));
+  }
+}

@@ -1,5 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
+  Pressable,
   ScrollView,
   StyleSheet,
   View,
@@ -12,68 +14,73 @@ import { AppText as Text } from "../../components/AppText";
 import { AppShell } from "../../components/AppShell";
 import { FilterGroup, SearchFilterBar } from "../../components/SearchFilterBar";
 import {
-  rentRepository,
-  type OwnerTenant,
-  type TenantQuery,
-} from "../../services/rentRepository";
+  getLandlordTenancies,
+  type Tenancy,
+} from "../../services/tenancyApi";
 import { createPlatformShadow, useThemedStyles } from "../../theme";
 import type { AppTheme } from "../../theme";
-
-const FILTERS: FilterGroup[] = [
-  {
-    key: "status",
-    label: "Payment status",
-    options: [
-      { label: "Paid", value: "Paid" },
-      { label: "Due", value: "Due" },
-      { label: "Late fee", value: "Late Fee" },
-    ],
-  },
-  {
-    key: "date",
-    label: "Rent month",
-    options: [
-      { label: "September 2025", value: "2025-09" },
-      { label: "August 2025", value: "2025-08" },
-    ],
-  },
-  {
-    key: "property",
-    label: "Property",
-    options: [
-      { label: "Green View", value: "Green View Apartments" },
-      { label: "Lake Side", value: "Lake Side Residency" },
-      { label: "Palm Grove", value: "Palm Grove Villa" },
-    ],
-  },
-];
 
 export default function Tenants() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [tenants, setTenants] = useState<OwnerTenant[]>([]);
+  const [allTenancies, setAllTenancies] = useState<Tenancy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [addTenantVisible, setAddTenantVisible] = useState(false);
   const router = useRouter();
   const styles = useThemedStyles(createStyles);
-  const query = useMemo<TenantQuery>(
-    () => ({
-      search,
-      status: filters.status as TenantQuery["status"],
-      date: filters.date,
-      property: filters.property,
-    }),
-    [search, filters],
-  );
+
+  const loadTenancies = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setAllTenancies(await getLandlordTenancies());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load tenants.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    rentRepository.getOwnerTenants(query).then(setTenants);
-  }, [query]);
+    loadTenancies();
+  }, [loadTenancies]);
 
-  const handleTenantAdded = (tenant: OwnerTenant) => {
-    setSearch("");
-    setFilters({});
-    setTenants((current) => [tenant, ...current]);
-  };
+  const filterGroups = useMemo<FilterGroup[]>(() => {
+    const properties = new Map<number, string>();
+    allTenancies.forEach((t) => properties.set(t.property_id, t.property_name));
+    return [
+      {
+        key: "status",
+        label: "Status",
+        options: [
+          { label: "Active", value: "ACTIVE" },
+          { label: "Ended", value: "ENDED" },
+        ],
+      },
+      {
+        key: "property",
+        label: "Property",
+        options: Array.from(properties, ([id, name]) => ({
+          label: name,
+          value: String(id),
+        })),
+      },
+    ];
+  }, [allTenancies]);
+
+  const tenants = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return allTenancies.filter(
+      (t) =>
+        (!term ||
+          `${t.tenant_name} ${t.current_rent_schedule?.rent_amount ?? ""}`
+            .toLowerCase()
+            .includes(term)) &&
+        (!filters.status || t.status === filters.status) &&
+        (!filters.property || String(t.property_id) === filters.property),
+    );
+  }, [allTenancies, search, filters]);
 
   return (
     <AppShell active="Tenants" style={styles.screenContent}>
@@ -94,54 +101,59 @@ export default function Tenants() {
         query={search}
         onQueryChange={setSearch}
         placeholder="Search name or rent amount"
-        filters={FILTERS}
+        filters={filterGroups}
         selectedFilters={filters}
         onFilterChange={(key, value) =>
           setFilters((current) => ({ ...current, [key]: value }))
         }
       />
 
+      {loading ? <ActivityIndicator style={styles.empty} /> : null}
+      {error ? (
+        <Text variant="bodySmall" color="textSecondary" style={styles.emptyCopy}>
+          {error}
+        </Text>
+      ) : null}
+
       {tenants.map((tenant) => (
-        <View key={tenant.id} style={styles.row}>
+        <Pressable
+          key={tenant.id}
+          style={styles.row}
+          onPress={() =>
+            router.push({
+              pathname: "/owner/tenants/[id]",
+              params: { id: String(tenant.id) },
+            })
+          }
+        >
           <View style={styles.avatar}>
-            <Text variant="label">{tenant.tenant.charAt(0).toUpperCase()}</Text>
+            <Text variant="label">{tenant.tenant_name.charAt(0).toUpperCase()}</Text>
           </View>
           <View style={styles.info}>
-            <Text variant="label" style={styles.name}>{tenant.tenant}</Text>
+            <Text variant="label" style={styles.name}>{tenant.tenant_name}</Text>
             <Text variant="caption" color="textSecondary" style={styles.meta}>
-              {[tenant.unit, tenant.property].filter(Boolean).join(" · ")}
+              {[tenant.room_number, tenant.property_name].filter(Boolean).join(" · ")}
             </Text>
-            {tenant.mobileNumber ? (
-              <Text variant="caption" color="textSecondary" style={styles.meta}>
-                {tenant.mobileNumber}
+            <Text variant="caption" color="textSecondary" style={styles.meta}>
+              {tenant.tenant_mobile_number}
+            </Text>
+            {tenant.current_rent_schedule ? (
+              <Text variant="bodySmall" style={styles.amount}>
+                ₹{Number(tenant.current_rent_schedule.rent_amount).toLocaleString("en-IN")}
+                {` / ${tenant.current_rent_schedule.frequency.toLowerCase()}`}
               </Text>
             ) : null}
-            <Text variant="bodySmall" style={styles.amount}>
-              ₹{tenant.amount.toLocaleString("en-IN")}
-              {tenant.paymentFrequency ? ` / ${tenant.paymentFrequency}` : ""}
-            </Text>
-            <Text variant="caption" color="textSecondary" style={styles.meta}>
-              {tenant.collectionDate
-                ? `Collection date · ${tenant.date}`
-                : tenant.date}
-            </Text>
           </View>
           <Text
             variant="caption"
-            style={
-              tenant.status === "Paid"
-                ? styles.paid
-                : tenant.status === "Due"
-                  ? styles.due
-                  : styles.late
-            }
+            style={tenant.status === "ACTIVE" ? styles.paid : styles.late}
           >
             {tenant.status}
           </Text>
-        </View>
+        </Pressable>
       ))}
 
-      {!tenants.length ? (
+      {!loading && !error && !tenants.length ? (
         <View style={styles.empty}>
           <Text variant="subheading" style={styles.emptyTitle}>
             {search || Object.values(filters).some(Boolean)
@@ -161,7 +173,11 @@ export default function Tenants() {
       <AddTenantSheet
         visible={addTenantVisible}
         onClose={() => setAddTenantVisible(false)}
-        onAdded={handleTenantAdded}
+        onAdded={() => {
+          setSearch("");
+          setFilters({});
+          loadTenancies();
+        }}
       />
     </AppShell>
   );
