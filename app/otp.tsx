@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   TextInput,
+  type TextInputInstance,
   Platform,
   Pressable,
   KeyboardAvoidingView,
@@ -36,7 +37,7 @@ export default function Otp() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendAfter, setResendAfter] = useState<number | null>(null);
 
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
